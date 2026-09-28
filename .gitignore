@@ -1,0 +1,33 @@
+*.iml
+.gradle
+/local.properties
+/.idea/
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Keystore files
+*.jks
+*.keystore
+keystore.properties
+
+# Android Studio
+*.apk
+*.ap_
+*.aab
+/app/release/
+
+# Salidas de compilacion y archivos generados
+build/
+/app/build/
+.kotlin/
+captures/
+.idea/
+.gradle/
+*.apk
+*.aab
+FIX_PR_INSTRUCTIONS.md
+
