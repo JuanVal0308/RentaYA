@@ -40,7 +40,7 @@ object SampleData {
     }
     
     // TODO(equipo - Steve): Agregar 3 apartamentos (Aranjuez, Manrique, Robledo) y 2 casas (Bello, Itagüí)
-    // TODO(equipo - Mariana): Agregar 3 apartamentos (Laureles Norte, Estadio, Guayabal) y 2 cuartos (Buenos Aires, Castilla)
+    // TODO(equipo - Mariana): Agregar 2 cuartos (Buenos Aires, Castilla)
     // También agregar INSERTs equivalentes en docs/supabase/semillas_steve.sql o semillas_mariana.sql
     val properties = listOf(
         Property(
@@ -302,6 +302,45 @@ object SampleData {
             area = 48,
             amenities = listOf(),
             landlord = Landlord("Lucía Ramírez", 4.1f, "319 012 3456")
+        ),
+        Property(
+            id = "mariana-31",
+            title = "Apto en Laureles Norte",
+            description = "Apartamento luminoso a dos cuadras de la avenida Nutibara. Cerca a cafés, supermercados y ciclorruta.",
+            type = PropertyType.APARTAMENTO,
+            price = 1450000,
+            neighborhood = "Laureles Norte",
+            bedrooms = 2,
+            bathrooms = 2,
+            area = 62,
+            amenities = listOf("Gimnasio"),
+            landlord = Landlord("Camila Restrepo", 4.4f, "320 111 2233")
+        ),
+        Property(
+            id = "mariana-32",
+            title = "Apto con balcón en Estadio",
+            description = "Apartamento remodelado a pocos minutos de la estación Estadio del metro. Balcón con vista a la unidad deportiva.",
+            type = PropertyType.APARTAMENTO,
+            price = 1750000,
+            neighborhood = "Estadio",
+            bedrooms = 3,
+            bathrooms = 2,
+            area = 78,
+            amenities = listOf("Parqueadero", "Amoblado"),
+            landlord = Landlord("Julián Cardona", 4.6f, "321 222 3344")
+        ),
+        Property(
+            id = "mariana-33",
+            title = "Apto en Guayabal",
+            description = "Apartamento práctico en unidad cerrada, cerca al aeropuerto Olaya Herrera y a la avenida Guayabal.",
+            type = PropertyType.APARTAMENTO,
+            price = 1150000,
+            neighborhood = "Guayabal",
+            bedrooms = 2,
+            bathrooms = 1,
+            area = 54,
+            amenities = listOf("Parqueadero"),
+            landlord = Landlord("Natalia Zapata", 4.3f, "322 333 4455")
         )
     )
 }
