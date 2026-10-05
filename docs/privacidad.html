@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Política de Privacidad - Renta Ya</title>
+    <title>Política de Privacidad - RentaYa</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
@@ -29,80 +29,83 @@
     </style>
 </head>
 <body>
-    <h1>Política de Privacidad de Renta Ya</h1>
-    <p class="last-updated">Última actualización: Septiembre 28, 2026</p>
+    <h1>Política de Privacidad de RentaYa</h1>
+    <p class="last-updated">Última actualización: 5 de octubre de 2026</p>
 
     <h2>1. Introducción</h2>
     <p>
-        Renta Ya es una aplicación móvil desarrollada como proyecto académico para la Universidad Pontificia Bolivariana (UPB).
-        Esta política de privacidad explica cómo manejamos tu información.
+        RentaYa es una aplicación móvil desarrollada como proyecto académico para la Universidad Pontificia Bolivariana (UPB).
+        Esta política explica cómo se maneja la información según el modo de operación de la app.
     </p>
 
-    <h2>2. Información que NO recopilamos</h2>
+    <h2>2. Dos modos de almacenamiento</h2>
     <p>
-        Renta Ya funciona completamente de manera local en tu dispositivo. <strong>No recopilamos, almacenamos ni compartimos 
-        ningún dato personal con servidores externos</strong>.
-    </p>
-
-    <h2>3. Almacenamiento local</h2>
-    <p>
-        Toda la información que ingresas en la aplicación (incluyendo tu nombre, correo electrónico, contraseña, y preferencias) 
-        se almacena únicamente en tu dispositivo móvil. Esta información:
+        RentaYa puede funcionar de dos formas, según la configuración del desarrollador en tiempo de compilación:
     </p>
     <ul>
-        <li>Permanece en tu dispositivo</li>
-        <li>No se transmite a ningún servidor</li>
-        <li>No se comparte con terceros</li>
-        <li>Se elimina cuando desinstalas la aplicación</li>
+        <li>
+            <strong>Modo local (por defecto):</strong> si no hay claves de backend, la app no envía datos personales
+            a servidores externos. Nombre, correo, teléfono, contraseña y preferencias quedan en el dispositivo
+            (DataStore y memoria de la sesión).
+        </li>
+        <li>
+            <strong>Modo con Supabase (opcional):</strong> cuando se configuran la URL del proyecto y la clave anónima,
+            el registro e inicio de sesión usan <em>Supabase Auth</em>, y las propiedades pueden leerse o publicarse
+            en la base de datos del proyecto Supabase. En ese caso, los datos de cuenta (correo, nombre, teléfono
+            en el perfil) y el catálogo de inmuebles se almacenan en servidores de Supabase (proveedor de infraestructura).
+        </li>
     </ul>
 
-    <h2>4. Funcionalidad offline</h2>
+    <h2>3. Datos que puede manejar la aplicación</h2>
+    <ul>
+        <li>Datos de cuenta: nombre, correo electrónico, teléfono y contraseña (esta última gestionada por Auth en modo remoto).</li>
+        <li>Preferencias: tema claro/oscuro, notificaciones (solo en el dispositivo).</li>
+        <li>Contenido de inmuebles publicados (título, descripción, precio, barrio, etc.).</li>
+        <li>Favoritos y mensajes de chat en la versión actual se mantienen principalmente en memoria local.</li>
+    </ul>
+
+    <h2>4. Con quién se comparten</h2>
     <p>
-        Esta aplicación funciona completamente sin conexión a internet. Las propiedades mostradas son datos de ejemplo 
-        con fines demostrativos y educativos.
+        No vendemos datos personales. En modo Supabase, el proveedor del servicio de base de datos y autenticación
+        es Supabase (según su propia política de privacidad y la región elegida al crear el proyecto).
+        No se usan redes publicitarias en esta versión académica.
     </p>
 
-    <h2>5. Permisos de la aplicación</h2>
-    <p>
-        La aplicación puede solicitar los siguientes permisos:
-    </p>
+    <h2>5. Permisos</h2>
     <ul>
-        <li><strong>Internet:</strong> Declarado por requisitos del framework, pero no utilizado para transmitir datos personales</li>
+        <li><strong>Internet:</strong> necesario para autenticación y sincronización cuando Supabase está habilitado.
+            En modo local no se transmiten datos de cuenta.</li>
     </ul>
 
     <h2>6. Datos de ejemplo</h2>
     <p>
-        Todas las propiedades, nombres de arrendadores, y otra información mostrada en la aplicación son datos ficticios 
-        creados con propósitos educativos.
+        Las propiedades semilla, nombres de arrendadores y teléfonos de demostración son ficticios,
+        creados con fines educativos.
     </p>
 
     <h2>7. Seguridad</h2>
     <p>
-        Al almacenar toda la información localmente en tu dispositivo, la seguridad de tus datos depende de las medidas 
-        de seguridad de tu dispositivo móvil. Recomendamos:
+        Recomendamos proteger el dispositivo con bloqueo de pantalla, usar contraseñas seguras y no compartir
+        capturas con datos reales de acceso. La clave <em>anon</em> de Supabase es pública por diseño y está
+        limitada por políticas RLS; la clave <em>service_role</em> nunca debe incluirse en la app.
     </p>
-    <ul>
-        <li>Mantener tu dispositivo protegido con contraseña/PIN</li>
-        <li>Mantener tu sistema operativo actualizado</li>
-        <li>Usar contraseñas seguras en la aplicación</li>
-    </ul>
 
     <h2>8. Cambios a esta política</h2>
     <p>
-        Podemos actualizar esta política de privacidad ocasionalmente. Te notificaremos de cualquier cambio mediante 
-        una actualización de la aplicación.
+        Podemos actualizar esta política con nuevas versiones de la aplicación. La fecha de actualización
+        aparece al inicio de este documento.
     </p>
 
     <h2>9. Contacto</h2>
     <p>
-        Si tienes preguntas sobre esta política de privacidad, puedes contactarnos a través del repositorio del proyecto:
+        Preguntas sobre privacidad: repositorio del proyecto
         <a href="https://github.com/JuanVal0308/RentaYA">https://github.com/JuanVal0308/RentaYA</a>
     </p>
 
     <h2>10. Propósito académico</h2>
     <p>
-        Esta aplicación ha sido desarrollada exclusivamente con fines académicos para el curso de Aplicaciones Móviles 
-        de la Universidad Pontificia Bolivariana. No es una aplicación comercial y no se utiliza para ningún propósito comercial.
+        Aplicación desarrollada exclusivamente con fines académicos para el curso de Aplicaciones Móviles
+        de la Universidad Pontificia Bolivariana. No es un producto comercial.
     </p>
 </body>
 </html>

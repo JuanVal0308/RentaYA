@@ -1,141 +1,102 @@
-# TAREAS PARA EL EQUIPO
+# Tareas del equipo — RentaYa (Entrega 3)
 
-Este documento contiene tareas pendientes para que los integrantes del equipo completen. Cada tarea está marcada con `TODO(equipo)` en el código.
+Cada integrante debe aportar **al menos 10 commits propios** con su cuenta de GitHub  
+(`user.name` / `user.email` de **esa** persona). No uses co-autoría de herramientas ni bots.
 
-## 📝 Tareas Disponibles
+Los marcadores en código son:
 
-### 1. Agregar información de integrantes en Créditos ⭐ FÁCIL
-**Archivos:** `app/src/main/java/com/rentaya/app/ui/screens/CreditsScreen.kt`
+- `TODO(equipo - Steve)`
+- `TODO(equipo - Mariana)`
 
-**Pasos:**
-1. Abrir el archivo `CreditsScreen.kt`
-2. Buscar los comentarios `// TODO(equipo): Agregar información del segundo integrante` y `// TODO(equipo): Agregar información del tercer integrante`
-3. Reemplazar "Integrante 2" y "Integrante 3" con sus nombres completos
-4. Opcional: Agregar sus fotos o cambiar el rol si aplica
-
-**Ejemplo:**
-```kotlin
-TeamMemberCard(
-    name = "María Pérez González",
-    role = "Desarrolladora"
-)
-```
+La infraestructura (marca RentaYa, repositorios, ClienteSupabase, esquema SQL, README/Figma)  
+ya la dejó Juan. **No cierres las tareas deliberadas de los otros** si no eres esa persona.
 
 ---
 
-### 2. Agregar más propiedades de ejemplo ⭐ FÁCIL
-**Archivos:** `app/src/main/java/com/rentaya/app/data/SampleData.kt`
+## Cómo hacer commits con tu propia cuenta
 
-**Pasos:**
-1. Abrir el archivo `SampleData.kt`
-2. En la lista `properties`, agregar 5 nuevas propiedades siguiendo el formato existente
-3. Usar barrios reales de Medellín: Laureles, Belén, Estadio, Aranjuez, etc.
-4. Variar precios, tipos (APARTAMENTO, CASA, CUARTO), y amenidades
+1. Clona el repo y crea una rama:
+   ```bash
+   git clone https://github.com/JuanVal0308/RentaYA.git
+   cd RentaYA
+   git checkout -b feature/steve-creditos   # o feature/mariana-...
+   ```
+2. Configura **solo en este repo** (o en tu máquina) tu identidad de GitHub:
+   ```bash
+   git config user.name "Tu Nombre En GitHub"
+   git config user.email "tu-email-de-github@ejemplo.com"
+   ```
+3. Un cambio lógico = un commit. Mensajes **en español**, por ejemplo:
+   ```bash
+   git add -A
+   git commit -m "Agrega nombre de Steve en la pantalla de créditos"
+   ```
+4. Sube la rama y abre un Pull Request hacia `main`:
+   ```bash
+   git push -u origin feature/steve-creditos
+   ```
+5. Pide revisión a Juan. Tras el merge, sigue con la siguiente tarea en una rama nueva.
 
-**Ejemplo:**
-```kotlin
-Property(
-    id = "21",
-    title = "Apto en Aranjuez",
-    description = "Apartamento cerca al metro...",
-    type = PropertyType.APARTAMENTO,
-    price = 1250000,
-    neighborhood = "Aranjuez",
-    bedrooms = 2,
-    bathrooms = 1,
-    area = 55,
-    amenities = listOf("Parqueadero"),
-    landlord = Landlord("Nombre Apellido", 4.3f, "300 XXX XXXX")
-)
-```
-
----
-
-### 3. Implementar diálogo "¿Olvidaste la clave?" ⭐⭐ MEDIA
-**Archivos:** `app/src/main/java/com/rentaya/app/ui/screens/LoginScreen.kt`
-
-**Pasos:**
-1. Abrir `LoginScreen.kt`
-2. Buscar el comentario `TODO(equipo): Implementar diálogo de recuperación de contraseña`
-3. Crear un estado `var showForgotPasswordDialog by remember { mutableStateOf(false) }`
-4. Cambiar el `onClick` del TextButton para mostrar el diálogo: `onClick = { showForgotPasswordDialog = true }`
-5. Agregar un `AlertDialog` que muestre un mensaje como "Funcionalidad no disponible en versión offline"
-
-**Ayuda:** Revisar el `AlertDialog` en `SettingsScreen.kt` como referencia.
+**Meta:** ≥ **10 commits** visibles con tu autoría en el historial de `main` (vía PR).
 
 ---
 
-### 4. Implementar pantalla "Acerca de" ⭐⭐ MEDIA
-**Archivos:** 
-- Crear: `app/src/main/java/com/rentaya/app/ui/screens/AboutScreen.kt`
-- Modificar: `app/src/main/java/com/rentaya/app/ui/screens/SettingsScreen.kt`
-- Modificar: `app/src/main/java/com/rentaya/app/ui/navigation/Screen.kt` y `RentaYaApp.kt`
+## Tareas de Steve (≥12 ítems tamaño-commit)
 
-**Pasos:**
-1. Crear una nueva pantalla `AboutScreen.kt` similar a `CreditsScreen.kt`
-2. Mostrar información como: versión de la app, descripción del proyecto, tecnologías usadas
-3. Agregar la ruta en `Screen.kt`: `object About : Screen("about")`
-4. Agregar la navegación en `RentaYaApp.kt`
-5. En `SettingsScreen.kt`, buscar el TODO y cambiar el `onClick` para navegar a la pantalla About
-
----
-
-### 5. Implementar vista "Mis publicaciones" ⭐⭐ MEDIA
-**Archivos:**
-- Crear: `app/src/main/java/com/rentaya/app/ui/screens/MyPropertiesScreen.kt`
-- Modificar: `app/src/main/java/com/rentaya/app/data/SampleData.kt`
-- Modificar: `app/src/main/java/com/rentaya/app/ui/screens/ProfileScreen.kt`
-
-**Pasos:**
-1. En `SampleData.kt`, agregar una lista `val myProperties = mutableListOf<Property>()` para guardar propiedades publicadas
-2. Modificar `PublishPropertyScreen.kt` para agregar las propiedades publicadas a esa lista
-3. Crear `MyPropertiesScreen.kt` que muestre las propiedades del usuario
-4. Agregar navegación en `ProfileScreen.kt` y `RentaYaApp.kt`
+| # | Tarea | Archivo(s) | Marcador | Mensaje de commit sugerido |
+|---|--------|------------|----------|----------------------------|
+| 1 | Poner tu nombre y rol (reemplazar “Integrante 2”) | `CreditsScreen.kt` | `TODO(equipo - Steve)` | `Agrega nombre de Steve en la pantalla de créditos` |
+| 2 | Actualizar sección Equipo del README con tu nombre | `README.md` | tabla Equipo | `Actualiza el README con el nombre de Steve` |
+| 3 | Agregar **3 apartamentos** (Aranjuez, Manrique, Robledo) en SampleData | `SampleData.kt` | `TODO(equipo - Steve)` en SampleData | `Agrega tres apartamentos de ejemplo en SampleData` |
+| 4 | Agregar **2 casas** (Bello, Itagüí) con amenidades distintas | `SampleData.kt` | mismo | `Agrega dos casas de ejemplo en SampleData` |
+| 5 | INSERTs equivalentes en SQL | `docs/supabase/semillas_steve.sql` | `TODO(equipo - Steve)` | `Agrega semillas SQL de propiedades de Steve` |
+| 6 | Diálogo “¿Olvidaste la clave?” | `LoginScreen.kt` | `TODO(equipo - Steve)` | `Implementa el diálogo de recuperación de contraseña` |
+| 7 | Validar formato de correo en registro | `RegisterScreen.kt` | `TODO(equipo - Steve)` | `Valida el formato del correo en el registro` |
+| 8 | Validar teléfono colombiano (10 dígitos) | `RegisterScreen.kt` | `TODO(equipo - Steve)` | `Valida el teléfono colombiano en el registro` |
+| 9 | Filtro de precio máximo más claro (chip o etiqueta) | `SearchScreen.kt` | `TODO(equipo - Steve)` | `Mejora el filtro de precio máximo en la búsqueda` |
+| 10 | Contador “X favoritos” cuando la lista no esté vacía | `FavoritesScreen.kt` | `TODO(equipo - Steve)` | `Muestra el contador de favoritos en la barra` |
+| 11 | Crear `AboutScreen` (versión, UPB, Kotlin/Compose) y cablear desde Ajustes | nuevo `AboutScreen.kt`, `Screen.kt`, `RentaYaApp.kt`, `SettingsScreen.kt` | `TODO(equipo - Steve)` en Settings | `Agrega la pantalla Acerca de y su navegación` |
+| 12 | *(Bonus)* 2 capturas Login + Búsqueda en `docs/capturas/` y enlace en README | `docs/capturas/`, `README.md` | comentario capturas | `Agrega capturas de Login y Búsqueda al README` |
+| 13 | *(Bonus)* Tipo `PARQUEADERO` o amenidad “Mascotas” + 1 propiedad | `Property.kt`, `SampleData.kt` | — | `Agrega amenidad Mascotas y una propiedad de ejemplo` |
 
 ---
 
-### 6. Agregar capturas de pantalla al README ⭐ FÁCIL
-**Archivos:** `README.md`, `docs/capturas/`
+## Tareas de Mariana (≥12 ítems tamaño-commit)
 
-**Pasos:**
-1. Ejecutar la app en un emulador o dispositivo
-2. Tomar capturas de pantalla de las principales pantallas (Onboarding, Login, Búsqueda, Detalle, Perfil)
-3. Guardar las imágenes en `docs/capturas/`
-4. Agregar las imágenes al README.md en la sección correspondiente
+| # | Tarea | Archivo(s) | Marcador | Mensaje de commit sugerido |
+|---|--------|------------|----------|----------------------------|
+| 1 | Poner tu nombre y rol (reemplazar “Integrante 3”) | `CreditsScreen.kt` | `TODO(equipo - Mariana)` | `Agrega nombre de Mariana en la pantalla de créditos` |
+| 2 | Actualizar README (integrante 3; capturas o texto de equipo) | `README.md` | tabla Equipo | `Actualiza el README con el nombre de Mariana` |
+| 3 | Agregar **3 apartamentos** (Laureles Norte, Estadio, Guayabal) | `SampleData.kt` | `TODO(equipo - Mariana)` | `Agrega tres apartamentos de ejemplo de Mariana` |
+| 4 | Agregar **2 cuartos** económicos (Buenos Aires, Castilla) | `SampleData.kt` | mismo | `Agrega dos cuartos económicos en SampleData` |
+| 5 | INSERTs equivalentes en SQL | `docs/supabase/semillas_mariana.sql` | `TODO(equipo - Mariana)` | `Agrega semillas SQL de propiedades de Mariana` |
+| 6 | **Persistir publicar**: llamar `RepositorioPropiedades.publicarPropiedad` desde el formulario | `PublishPropertyScreen.kt` | `TODO(equipo - Mariana)` (el repo **ya** implementa el método) | `Conecta el formulario de publicar con el repositorio` |
+| 7 | Validaciones extra: precio > 0, área > 0, habitaciones ≥ 1 | `PublishPropertyScreen.kt` | mismo bloque | `Agrega validaciones de precio, área y habitaciones` |
+| 8 | Pantalla **Mis publicaciones** + navegación desde Perfil | nuevo `MyPropertiesScreen.kt`, `Screen.kt`, `RentaYaApp.kt`, `ProfileScreen.kt` | `TODO(equipo - Mariana)` en Profile | `Agrega la pantalla Mis publicaciones` |
+| 9 | Empty state mejorado en mensajes (ícono, texto, CTA a Buscar) | `MessagesScreen.kt` | `TODO(equipo - Mariana)` | `Mejora el estado vacío de la bandeja de mensajes` |
+| 10 | Sección “Tecnologías usadas” en Créditos o About | `CreditsScreen.kt` o About | `TODO(equipo - Mariana)` | `Documenta las tecnologías usadas en Créditos` |
+| 11 | ≥4 capturas para Play/README en `docs/capturas/` | `docs/capturas/`, `README.md` | comentario capturas | `Agrega capturas de pantalla para Play y README` |
+| 12 | *(Bonus)* Persistencia de IDs de favoritos en DataStore | `UserPreferences.kt`, pantallas favoritos | — | `Persiste los favoritos en DataStore` |
+| 13 | *(Bonus)* Revisar párrafo de privacidad / enlace en Settings si aplica | `docs/privacidad.html` | coordinar con Juan | `Ajusta el texto de privacidad según el modo remoto` |
+
+### Nota sobre la tarea 6 (publicar)
+
+`RepositorioPropiedades.publicarPropiedad` **ya está listo**: agrega a la lista local mutable y, si hay Supabase, hace INSERT.  
+Tu trabajo es **solo cablear la UI** del `PublishPropertyScreen` (construir el `Property` y llamar al método en un `coroutineScope`).
+
+Para listar “Mis publicaciones” usa `RepositorioPropiedades.obtenerPublicadasLocalmente()`.
 
 ---
 
-### 7. Agregar enlace de Figma al README ⭐ FÁCIL
-**Archivos:** `README.md`
+## Qué no deben tocar (salvo acuerdo)
 
-**Pasos:**
-1. Crear los wireframes digitales en Figma (si aún no existen)
-2. Obtener el enlace público del proyecto de Figma
-3. En el README.md, buscar la línea que dice `- Digitales: [TODO - Agregar enlace Figma]`
-4. Reemplazarla con el enlace real: `- Digitales: [Ver en Figma](https://figma.com/...)`
+- No agregar colaboradores bots ni `Co-authored-by` de agentes.
+- No subir `local.properties`, keystores ni claves `service_role`.
+- No borrar los TODOs de la otra persona.
+- Package `com.rentaya.app` y nombre visible **RentaYa** se mantienen.
 
----
+## Referencias rápidas
 
-## 🚀 Cómo contribuir
-
-1. Escoger una tarea de la lista
-2. Crear una rama: `git checkout -b feature/nombre-tarea`
-3. Hacer los cambios necesarios
-4. Probar que la app compila y funciona: `./gradlew assembleDebug`
-5. Commit: `git commit -m "feat: descripción de la tarea"`
-6. Push: `git push origin feature/nombre-tarea`
-7. Crear un Pull Request hacia `main`
-
-## ⚠️ Importante
-
-- Asegurarse de que el código compila antes de hacer push
-- Seguir el estilo de código existente
-- Probar los cambios en la app antes de hacer commit
-- Consultar con el equipo si tienen dudas
-
-## 📞 Contacto
-
-Si tienen preguntas sobre alguna tarea, pueden:
-- Abrir un issue en el repositorio
-- Contactar al equipo por el chat del proyecto
-- Revisar el código existente como referencia
+- Guía Supabase: [`docs/supabase/CONFIGURAR.md`](docs/supabase/CONFIGURAR.md)
+- Esquema + seed base: [`docs/supabase/esquema.sql`](docs/supabase/esquema.sql)
+- Prototipo Figma: https://www.figma.com/design/6IKRsM1DLKdmIa6J7ZciIO/Soluciones-parchadas
