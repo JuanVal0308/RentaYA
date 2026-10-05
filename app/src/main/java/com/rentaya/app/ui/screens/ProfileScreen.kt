@@ -22,6 +22,7 @@ fun ProfileScreen(
     onSettings: () -> Unit,
     onCredits: () -> Unit,
     onPublish: () -> Unit,
+    onMyProperties: () -> Unit,
     userPreferences: UserPreferences
 ) {
     val scope = rememberCoroutineScope()
@@ -94,7 +95,7 @@ fun ProfileScreen(
                     headlineContent = { Text("Mis publicaciones") },
                     leadingContent = { Icon(Icons.Default.Home, null) },
                     trailingContent = { Icon(Icons.Default.ChevronRight, null) },
-                    modifier = Modifier.clickable(onClick = { /* TODO(equipo - Mariana): Navegar a MyPropertiesScreen (Mis publicaciones) */ })
+                    modifier = Modifier.clickable(onClick = onMyProperties)
                 )
                 HorizontalDivider()
                 ListItem(

@@ -211,6 +211,9 @@ fun RentaYaApp(
                     onPublish = {
                         navController.navigate(Screen.PublishProperty.route)
                     },
+                    onMyProperties = {
+                        navController.navigate(Screen.MyProperties.route)
+                    },
                     userPreferences = userPreferences
                 )
             }
@@ -237,6 +240,18 @@ fun RentaYaApp(
                 PublishPropertyScreen(
                     onBack = { navController.navigateUp() },
                     onSuccess = { navController.navigateUp() }
+                )
+            }
+
+            composable(Screen.MyProperties.route) {
+                MyPropertiesScreen(
+                    onBack = { navController.navigateUp() },
+                    onPropertyClick = { propertyId ->
+                        navController.navigate(Screen.Detail.createRoute(propertyId))
+                    },
+                    onPublish = {
+                        navController.navigate(Screen.PublishProperty.route)
+                    }
                 )
             }
         }

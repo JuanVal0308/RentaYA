@@ -18,4 +18,5 @@ sealed class Screen(val route: String) {
     object Settings : Screen("settings")
     object Credits : Screen("credits")
     object PublishProperty : Screen("publish_property")
+    object MyProperties : Screen("my_properties")
 }
