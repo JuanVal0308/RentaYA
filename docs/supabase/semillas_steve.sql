@@ -1,0 +1,13 @@
+-- TODO(equipo - Steve): Agregar INSERTs de tus 3 apartamentos y 2 casas
+-- Ejemplo (ajusta ids únicos, p.ej. steve-21 ...):
+--
+-- insert into public.propiedades (
+--   id, titulo, descripcion, tipo, precio, barrio, habitaciones, banos, area,
+--   amenidades, arrendador_nombre, arrendador_calificacion, arrendador_telefono,
+--   imagen, latitud, longitud
+-- ) values
+--   ('steve-21', 'Apto en Aranjuez', '...', 'APARTAMENTO', 1250000, 'Aranjuez',
+--    2, 1, 55, '["Parqueadero"]'::jsonb, 'Nombre', 4.3, '300 000 0000',
+--    'sample', 6.27, -75.56);
+--
+-- Barrios sugeridos: Aranjuez, Manrique, Robledo (aptos) y Bello, Itagüí (casas).

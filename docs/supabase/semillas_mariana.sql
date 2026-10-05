@@ -1,0 +1,13 @@
+-- TODO(equipo - Mariana): Agregar INSERTs de tus 3 apartamentos y 2 cuartos
+-- Ejemplo (ajusta ids únicos, p.ej. mariana-31 ...):
+--
+-- insert into public.propiedades (
+--   id, titulo, descripcion, tipo, precio, barrio, habitaciones, banos, area,
+--   amenidades, arrendador_nombre, arrendador_calificacion, arrendador_telefono,
+--   imagen, latitud, longitud
+-- ) values
+--   ('mariana-31', 'Apto en Laureles Norte', '...', 'APARTAMENTO', 1450000, 'Laureles',
+--    2, 2, 62, '["Gimnasio"]'::jsonb, 'Nombre', 4.4, '301 000 0000',
+--    'sample', 6.25, -75.59);
+--
+-- Barrios sugeridos: Laureles Norte, Estadio, Guayabal (aptos) y Buenos Aires, Castilla (cuartos).
