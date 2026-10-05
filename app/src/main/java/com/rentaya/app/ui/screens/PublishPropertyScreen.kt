@@ -11,7 +11,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.rentaya.app.data.model.Landlord
+import com.rentaya.app.data.model.Property
 import com.rentaya.app.data.model.PropertyType
+import com.rentaya.app.data.repositorio.RepositorioPropiedades
+import kotlinx.coroutines.launch
+import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,6 +37,10 @@ fun PublishPropertyScreen(
     var hasGym by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
     var showSuccessDialog by remember { mutableStateOf(false) }
+    var cargando by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    // Mismo id en cada intento: reintentar tras un error no duplica la publicación local.
+    val idPropiedad = remember { UUID.randomUUID().toString() }
 
     Scaffold(
         topBar = {
@@ -221,26 +230,50 @@ fun PublishPropertyScreen(
                             if (isFurnished) amenities.add("Amoblado")
                             if (hasGym) amenities.add("Gimnasio")
 
-                            /*
-                             * TODO(equipo - Mariana): Hacer que publicar persista de verdad.
-                             * 1) Construir un Property con los campos del formulario
-                             *    (id puede ir vacío; el repositorio asigna UUID).
-                             * 2) En un rememberCoroutineScope().launch { ... } llamar:
-                             *      RepositorioPropiedades.publicarPropiedad(propiedad)
-                             * 3) Si Result.isSuccess, mostrar el diálogo; si no, errorMessage.
-                             * 4) Validar precio > 0, área > 0, habitaciones >= 1 (extra).
-                             * El método del repositorio YA está implementado (local + Supabase).
-                             * Ver también TAREAS_EQUIPO.md (tarea Mariana #6).
-                             */
-                            showSuccessDialog = true
+                            // TODO(equipo - Mariana): Validar precio > 0, área > 0, habitaciones >= 1
+                            val propiedad = Property(
+                                id = idPropiedad,
+                                title = title.trim(),
+                                description = description.trim(),
+                                type = selectedType,
+                                price = price.toIntOrNull() ?: 0,
+                                neighborhood = neighborhood.trim(),
+                                bedrooms = bedrooms.toIntOrNull() ?: 0,
+                                bathrooms = bathrooms.toIntOrNull() ?: 0,
+                                area = area.toIntOrNull() ?: 0,
+                                amenities = amenities,
+                                landlord = Landlord("Arrendador", 4.0f)
+                            )
+                            cargando = true
+                            errorMessage = ""
+                            scope.launch {
+                                val resultado = RepositorioPropiedades.publicarPropiedad(propiedad)
+                                cargando = false
+                                resultado.fold(
+                                    onSuccess = { showSuccessDialog = true },
+                                    onFailure = { error ->
+                                        errorMessage = error.message
+                                            ?: "No se pudo publicar la propiedad"
+                                    }
+                                )
+                            }
                         }
                     }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp)
+                    .height(56.dp),
+                enabled = !cargando
             ) {
-                Text("Publicar")
+                if (cargando) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text("Publicar")
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
