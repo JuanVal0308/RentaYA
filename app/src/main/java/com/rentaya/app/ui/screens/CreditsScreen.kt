@@ -38,7 +38,7 @@ fun CreditsScreen(
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             Text(
-                text = "Renta Ya",
+                text = "RentaYa",
                 style = MaterialTheme.typography.displaySmall,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -87,7 +87,7 @@ fun CreditsScreen(
             )
 
             Text(
-                text = "© 2026 Renta Ya",
+                text = "© 2026 RentaYa",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

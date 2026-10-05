@@ -47,7 +47,7 @@ fun SearchScreen(
             .padding(16.dp)
     ) {
         Text(
-            text = "Renta Ya",
+            text = "RentaYa",
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.primary
         )
