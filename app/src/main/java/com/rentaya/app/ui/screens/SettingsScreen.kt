@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.rentaya.app.data.UserPreferences
+import com.rentaya.app.data.remoto.ClienteSupabase
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -143,6 +144,7 @@ fun SettingsScreen(
                     onClick = {
                         scope.launch {
                             userPreferences.logout()
+                            ClienteSupabase.cerrarSesionRemota()
                             showLogoutDialog = false
                             onLogout()
                         }

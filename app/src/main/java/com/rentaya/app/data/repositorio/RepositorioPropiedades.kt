@@ -14,14 +14,25 @@ object RepositorioPropiedades {
     /** Propiedades publicadas en esta sesión (y persistibles vía Supabase). */
     private val publicadasLocal = mutableListOf<Property>()
 
+    /** Caché de la última lista remota exitosa (para la UI síncrona). */
+    @Volatile
+    private var cacheRemota: List<Property>? = null
+
     fun usaSupabase(): Boolean = ClienteSupabase.estaConfigurado
 
     /**
-     * Lista síncrona para la UI: semillas + publicaciones locales.
-     * No bloquea la red; para refrescar remoto usar [listar].
+     * Lista síncrona para la UI: preferir caché remota si existe;
+     * si no, semillas + publicaciones locales.
      */
-    fun listarLocal(): List<Property> =
-        SampleData.properties + publicadasLocal.toList()
+    fun listarLocal(): List<Property> {
+        val remota = cacheRemota
+        if (remota != null) {
+            val idsRemotos = remota.map { it.id }.toSet()
+            val extras = publicadasLocal.filter { it.id !in idsRemotos }
+            return remota + extras
+        }
+        return SampleData.properties + publicadasLocal.toList()
+    }
 
     fun obtenerPorId(id: String): Property? =
         listarLocal().find { it.id == id }
@@ -37,12 +48,19 @@ object RepositorioPropiedades {
             return listarLocal()
         }
         val remoto = ClienteSupabase.obtenerPropiedades()
-        return remoto.getOrElse { listarLocal() }
+        return remoto.fold(
+            onSuccess = { lista ->
+                cacheRemota = lista
+                listarLocal()
+            },
+            onFailure = { listarLocal() }
+        )
     }
 
     /**
      * Publica una propiedad. Siempre la agrega a la lista local mutable.
-     * Si Supabase está configurado, también la inserta en la tabla `propiedades`.
+     * Si Supabase está configurado, también la inserta en la tabla `propiedades`
+     * con [ClienteSupabase.idUsuarioActual] como id_propietario.
      *
      * La pantalla PublishPropertyScreen debe llamar este método
      * (tarea pendiente del equipo — ver TODO(equipo - Mariana)).
@@ -60,11 +78,15 @@ object RepositorioPropiedades {
         if (!ClienteSupabase.estaConfigurado) {
             return Result.success(conId)
         }
-        val remoto = ClienteSupabase.insertarPropiedad(conId)
+        val remoto = ClienteSupabase.insertarPropiedad(
+            propiedad = conId,
+            idPropietario = ClienteSupabase.idUsuarioActual
+        )
         return if (remoto.isSuccess) {
+            // Invalidar caché para forzar refresco en el próximo listar().
+            cacheRemota = null
             Result.success(conId)
         } else {
-            // Ya quedó en local; se reporta el fallo remoto sin revertir.
             Result.failure(remoto.exceptionOrNull() ?: Exception("Error remoto al publicar"))
         }
     }

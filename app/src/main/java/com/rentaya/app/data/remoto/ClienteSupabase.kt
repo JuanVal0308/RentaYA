@@ -18,12 +18,23 @@ import java.util.concurrent.TimeUnit
 /**
  * Cliente HTTP ligero contra la API REST y Auth de Supabase.
  * Si [estaConfigurado] es false, los repositorios usan solo datos locales.
+ *
+ * Tras login/registro guarda [tokenAcceso] e [idUsuarioActual] para que
+ * los INSERT respeten las políticas RLS (rol authenticated).
  */
 object ClienteSupabase {
 
     val estaConfigurado: Boolean
         get() = BuildConfig.SUPABASE_URL.isNotBlank() &&
             BuildConfig.SUPABASE_ANON_KEY.isNotBlank()
+
+    @Volatile
+    var tokenAcceso: String? = null
+        private set
+
+    @Volatile
+    var idUsuarioActual: String? = null
+        private set
 
     private val clienteHttp: OkHttpClient by lazy {
         OkHttpClient.Builder()
@@ -36,14 +47,45 @@ object ClienteSupabase {
 
     private fun urlBase(): String = BuildConfig.SUPABASE_URL.trimEnd('/')
 
-    private fun encabezadosAuth(tokenAcceso: String? = null): Map<String, String> {
+    fun cerrarSesionRemota() {
+        tokenAcceso = null
+        idUsuarioActual = null
+    }
+
+    private fun encabezadosAuth(tokenAccesoOverride: String? = null): Map<String, String> {
         val mapa = mutableMapOf(
             "apikey" to BuildConfig.SUPABASE_ANON_KEY,
             "Content-Type" to "application/json"
         )
-        val bearer = tokenAcceso ?: BuildConfig.SUPABASE_ANON_KEY
+        val bearer = tokenAccesoOverride
+            ?: tokenAcceso
+            ?: BuildConfig.SUPABASE_ANON_KEY
         mapa["Authorization"] = "Bearer $bearer"
         return mapa
+    }
+
+    private fun guardarSesionDesdeRespuesta(json: JSONObject) {
+        val token = json.optString("access_token").takeIf { it.isNotBlank() }
+        if (token != null) {
+            tokenAcceso = token
+        }
+        val usuarioAuth = json.optJSONObject("user")
+        val id = usuarioAuth?.optString("id").orEmpty()
+        if (id.isNotBlank()) {
+            idUsuarioActual = id
+        }
+    }
+
+    private fun usuarioDesdeAuthJson(json: JSONObject, correoFallback: String, clave: String): User {
+        val usuarioAuth = json.optJSONObject("user")
+            ?: throw IllegalStateException("Respuesta de auth incompleta")
+        val correoUsuario = usuarioAuth.optString("email", correoFallback)
+        val meta = usuarioAuth.optJSONObject("user_metadata")
+        val nombre = meta?.optString("nombre")
+            ?.takeIf { it.isNotBlank() }
+            ?: correoUsuario.substringBefore("@")
+        val telefono = meta?.optString("telefono").orEmpty()
+        return User(correoUsuario, nombre, telefono, clave)
     }
 
     suspend fun iniciarSesion(correo: String, clave: String): Result<User> =
@@ -69,15 +111,8 @@ object ClienteSupabase {
                         )
                     }
                     val json = JSONObject(texto)
-                    val usuarioAuth = json.optJSONObject("user")
-                        ?: return@withContext Result.failure(Exception("Respuesta de auth incompleta"))
-                    val correoUsuario = usuarioAuth.optString("email", correo)
-                    val meta = usuarioAuth.optJSONObject("user_metadata")
-                    val nombre = meta?.optString("nombre")
-                        ?.takeIf { it.isNotBlank() }
-                        ?: correoUsuario.substringBefore("@")
-                    val telefono = meta?.optString("telefono").orEmpty()
-                    Result.success(User(correoUsuario, nombre, telefono, clave))
+                    guardarSesionDesdeRespuesta(json)
+                    Result.success(usuarioDesdeAuthJson(json, correo, clave))
                 }
             } catch (e: Exception) {
                 Result.failure(e)
@@ -115,8 +150,8 @@ object ClienteSupabase {
                     )
                 }
                 val json = JSONObject(texto)
-                val usuarioAuth = json.optJSONObject("user")
-                val idUsuario = usuarioAuth?.optString("id").orEmpty()
+                guardarSesionDesdeRespuesta(json)
+                val idUsuario = idUsuarioActual.orEmpty()
                 if (idUsuario.isNotBlank()) {
                     crearPerfil(idUsuario, nombre, correo, telefono)
                 }
@@ -142,13 +177,22 @@ object ClienteSupabase {
         val peticion = Request.Builder()
             .url("${urlBase()}/rest/v1/perfiles")
             .apply {
-                encabezadosAuth().forEach { (k, v) -> addHeader(k, v) }
+                // Debe ir con el JWT del usuario para pasar RLS (auth.uid() = id).
+                encabezadosAuth(tokenAcceso).forEach { (k, v) -> addHeader(k, v) }
                 addHeader("Prefer", "resolution=merge-duplicates,return=minimal")
             }
             .post(cuerpo.toRequestBody(jsonMedia))
             .build()
         try {
-            clienteHttp.newCall(peticion).execute().close()
+            clienteHttp.newCall(peticion).execute().use { respuesta ->
+                if (!respuesta.isSuccessful) {
+                    val err = respuesta.body?.string().orEmpty()
+                    android.util.Log.w(
+                        "ClienteSupabase",
+                        "No se pudo crear perfil: HTTP ${respuesta.code} $err"
+                    )
+                }
+            }
         } catch (_: Exception) {
             // El registro de auth ya ocurrió; el perfil es complementario.
         }
@@ -188,7 +232,7 @@ object ClienteSupabase {
 
     suspend fun insertarPropiedad(
         propiedad: Property,
-        idPropietario: String? = null
+        idPropietario: String? = idUsuarioActual
     ): Result<Property> = withContext(Dispatchers.IO) {
         if (!estaConfigurado) {
             return@withContext Result.failure(IllegalStateException("Supabase no configurado"))
@@ -219,7 +263,8 @@ object ClienteSupabase {
             val peticion = Request.Builder()
                 .url("${urlBase()}/rest/v1/propiedades")
                 .apply {
-                    encabezadosAuth().forEach { (k, v) -> addHeader(k, v) }
+                    // JWT de usuario para rol authenticated + RLS.
+                    encabezadosAuth(tokenAcceso).forEach { (k, v) -> addHeader(k, v) }
                     addHeader("Prefer", "return=representation")
                 }
                 .post(cuerpoJson.toString().toRequestBody(jsonMedia))
@@ -232,6 +277,32 @@ object ClienteSupabase {
                     )
                 }
                 Result.success(propiedad)
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun eliminarPropiedad(id: String): Result<Unit> = withContext(Dispatchers.IO) {
+        if (!estaConfigurado) {
+            return@withContext Result.failure(IllegalStateException("Supabase no configurado"))
+        }
+        try {
+            val peticion = Request.Builder()
+                .url("${urlBase()}/rest/v1/propiedades?id=eq.$id")
+                .apply {
+                    encabezadosAuth(tokenAcceso).forEach { (k, v) -> addHeader(k, v) }
+                }
+                .delete()
+                .build()
+            clienteHttp.newCall(peticion).execute().use { respuesta ->
+                if (!respuesta.isSuccessful) {
+                    val texto = respuesta.body?.string().orEmpty()
+                    return@withContext Result.failure(
+                        Exception(extraerMensajeError(texto, "No se pudo eliminar la propiedad"))
+                    )
+                }
+                Result.success(Unit)
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -275,6 +346,7 @@ object ClienteSupabase {
             json.optString("msg")
                 .ifBlank { json.optString("error_description") }
                 .ifBlank { json.optString("message") }
+                .ifBlank { json.optString("error") }
                 .ifBlank { respaldo }
         } catch (_: Exception) {
             respaldo

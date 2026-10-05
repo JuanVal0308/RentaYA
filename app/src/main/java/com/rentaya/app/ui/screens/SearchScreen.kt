@@ -32,9 +32,14 @@ fun SearchScreen(
     var selectedType by remember { mutableStateOf<PropertyType?>(null) }
     var showFilters by remember { mutableStateOf(false) }
     // TODO(equipo - Steve): Añadir filtro por precio máximo (chip o etiqueta del slider)
-    
-    val filteredProperties = remember(searchQuery, selectedType) {
-        RepositorioPropiedades.listarLocal().filter { property ->
+    var propiedades by remember { mutableStateOf(RepositorioPropiedades.listarLocal()) }
+
+    LaunchedEffect(Unit) {
+        propiedades = RepositorioPropiedades.listar()
+    }
+
+    val filteredProperties = remember(searchQuery, selectedType, propiedades) {
+        propiedades.filter { property ->
             val matchesSearch = searchQuery.isBlank() || 
                 property.neighborhood.contains(searchQuery, ignoreCase = true) ||
                 property.title.contains(searchQuery, ignoreCase = true)
