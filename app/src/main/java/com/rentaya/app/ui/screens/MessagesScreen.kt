@@ -5,11 +5,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.rentaya.app.data.SampleData
 import com.rentaya.app.data.model.Message
@@ -19,7 +22,8 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessagesScreen(
-    onChatClick: (String) -> Unit
+    onChatClick: (String) -> Unit,
+    onSearch: () -> Unit
 ) {
     val messages = remember { SampleData.getMessages() }
 
@@ -30,25 +34,43 @@ fun MessagesScreen(
             title = { Text("Mensajes") }
         )
 
-        // TODO(equipo - Mariana): Mejorar empty state (ícono, texto y CTA hacia Buscar)
         if (messages.isEmpty()) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 Column(
+                    modifier = Modifier.padding(32.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    Icon(
+                        Icons.Default.ChatBubbleOutline,
+                        contentDescription = null,
+                        modifier = Modifier.size(72.dp),
+                        tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        "No tienes mensajes",
+                        "Aún no tienes mensajes",
                         style = MaterialTheme.typography.titleMedium
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        "Contacta un arrendador para empezar a chatear",
+                        "Cuando contactes a un arrendador, tus conversaciones aparecerán aquí",
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center
                     )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Button(onClick = onSearch) {
+                        Icon(
+                            Icons.Default.Search,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Buscar inmuebles")
+                    }
                 }
             }
         } else {

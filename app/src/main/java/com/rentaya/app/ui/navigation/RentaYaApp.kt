@@ -185,6 +185,16 @@ fun RentaYaApp(
                 MessagesScreen(
                     onChatClick = { propertyId ->
                         navController.navigate(Screen.Chat.createRoute(propertyId))
+                    },
+                    onSearch = {
+                        // Misma navegación que la pestaña "Buscar" de la barra inferior.
+                        navController.navigate(Screen.Search.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
                     }
                 )
             }
