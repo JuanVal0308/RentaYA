@@ -13,8 +13,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.rentaya.app.data.SampleData
 import com.rentaya.app.data.UserPreferences
+import com.rentaya.app.data.repositorio.RepositorioUsuarios
 import kotlinx.coroutines.launch
 
 @Composable
@@ -27,6 +27,7 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
+    var cargando by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     Column(
@@ -61,7 +62,8 @@ fun LoginScreen(
             leadingIcon = { Icon(Icons.Default.Email, null) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            singleLine = true,
+            enabled = !cargando
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -85,7 +87,8 @@ fun LoginScreen(
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            singleLine = true,
+            enabled = !cargando
         )
 
         if (errorMessage.isNotEmpty()) {
@@ -99,9 +102,11 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        // TODO(equipo - Steve): Implementar diálogo de recuperación de contraseña
         TextButton(
-            onClick = { /* TODO(equipo): Implementar diálogo de recuperación de contraseña */ },
-            modifier = Modifier.align(Alignment.End)
+            onClick = { /* TODO(equipo - Steve): mostrar AlertDialog de recuperación */ },
+            modifier = Modifier.align(Alignment.End),
+            enabled = !cargando
         ) {
             Text("¿Olvidaste la clave?")
         }
@@ -113,22 +118,38 @@ fun LoginScreen(
                 if (email.isBlank() || password.isBlank()) {
                     errorMessage = "Por favor completa todos los campos"
                 } else {
-                    val user = SampleData.validateLogin(email, password)
-                    if (user != null) {
-                        scope.launch {
-                            userPreferences.login(user.email, user.name, user.phone)
-                            onLoginSuccess()
-                        }
-                    } else {
-                        errorMessage = "Correo o contraseña incorrectos"
+                    cargando = true
+                    errorMessage = ""
+                    scope.launch {
+                        val resultado = RepositorioUsuarios.iniciarSesion(email.trim(), password)
+                        cargando = false
+                        resultado.fold(
+                            onSuccess = { user ->
+                                userPreferences.login(user.email, user.name, user.phone)
+                                onLoginSuccess()
+                            },
+                            onFailure = { error ->
+                                errorMessage = error.message
+                                    ?: "Correo o contraseña incorrectos"
+                            }
+                        )
                     }
                 }
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp)
+                .height(56.dp),
+            enabled = !cargando
         ) {
-            Text("Entrar")
+            if (cargando) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Text("Entrar")
+            }
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -166,7 +187,7 @@ fun LoginScreen(
 
         Row {
             Text("¿No tienes cuenta? ")
-            TextButton(onClick = onRegister) {
+            TextButton(onClick = onRegister, enabled = !cargando) {
                 Text("Regístrate")
             }
         }

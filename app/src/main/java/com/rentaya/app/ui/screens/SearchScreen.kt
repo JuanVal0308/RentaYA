@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.rentaya.app.data.SampleData
+import com.rentaya.app.data.repositorio.RepositorioPropiedades
 import com.rentaya.app.data.model.Property
 import com.rentaya.app.data.model.PropertyType
 import java.text.NumberFormat
@@ -30,9 +31,10 @@ fun SearchScreen(
     var searchQuery by remember { mutableStateOf("") }
     var selectedType by remember { mutableStateOf<PropertyType?>(null) }
     var showFilters by remember { mutableStateOf(false) }
+    // TODO(equipo - Steve): Añadir filtro por precio máximo (chip o etiqueta del slider)
     
     val filteredProperties = remember(searchQuery, selectedType) {
-        SampleData.properties.filter { property ->
+        RepositorioPropiedades.listarLocal().filter { property ->
             val matchesSearch = searchQuery.isBlank() || 
                 property.neighborhood.contains(searchQuery, ignoreCase = true) ||
                 property.title.contains(searchQuery, ignoreCase = true)

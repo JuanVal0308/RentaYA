@@ -39,6 +39,9 @@ object SampleData {
         messages.add(message)
     }
     
+    // TODO(equipo - Steve): Agregar 3 apartamentos (Aranjuez, Manrique, Robledo) y 2 casas (Bello, Itagüí)
+    // TODO(equipo - Mariana): Agregar 3 apartamentos (Laureles Norte, Estadio, Guayabal) y 2 cuartos (Buenos Aires, Castilla)
+    // También agregar INSERTs equivalentes en docs/supabase/semillas_steve.sql o semillas_mariana.sql
     val properties = listOf(
         Property(
             id = "1",

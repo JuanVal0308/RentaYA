@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.rentaya.app.data.SampleData
+import com.rentaya.app.data.repositorio.RepositorioPropiedades
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -17,13 +18,14 @@ fun FavoritesScreen(
 ) {
     val favoriteIds = remember { SampleData.getFavorites() }
     val favoriteProperties = remember(favoriteIds) {
-        SampleData.properties.filter { it.id in favoriteIds }
+        RepositorioPropiedades.listarLocal().filter { it.id in favoriteIds }
     }
 
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
         TopAppBar(
+            // TODO(equipo - Steve): Mostrar contador "X favoritos" cuando la lista no esté vacía
             title = { Text("Favoritos") }
         )
 

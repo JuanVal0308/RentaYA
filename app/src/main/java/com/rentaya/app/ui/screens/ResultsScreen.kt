@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.rentaya.app.data.SampleData
+import com.rentaya.app.data.repositorio.RepositorioPropiedades
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,7 +25,7 @@ fun ResultsScreen(
         modifier = Modifier.fillMaxSize()
     ) {
         TopAppBar(
-            title = { Text("Resultados (${SampleData.properties.size})") },
+            title = { Text("Resultados (${RepositorioPropiedades.listarLocal().size})") },
             navigationIcon = {
                 IconButton(onClick = onBack) {
                     Icon(Icons.Default.ArrowBack, "Volver")
@@ -62,7 +63,7 @@ fun ResultsScreen(
                         style = MaterialTheme.typography.titleMedium
                     )
                     Text(
-                        "${SampleData.properties.size} propiedades",
+                        "${RepositorioPropiedades.listarLocal().size} propiedades",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -74,7 +75,7 @@ fun ResultsScreen(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(SampleData.properties) { property ->
+                items(RepositorioPropiedades.listarLocal()) { property ->
                     PropertyCard(
                         property = property,
                         onClick = { onPropertyClick(property.id) }

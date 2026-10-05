@@ -11,9 +11,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.rentaya.app.data.SampleData
-import com.rentaya.app.data.model.Landlord
-import com.rentaya.app.data.model.Property
 import com.rentaya.app.data.model.PropertyType
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -224,6 +221,17 @@ fun PublishPropertyScreen(
                             if (isFurnished) amenities.add("Amoblado")
                             if (hasGym) amenities.add("Gimnasio")
 
+                            /*
+                             * TODO(equipo - Mariana): Hacer que publicar persista de verdad.
+                             * 1) Construir un Property con los campos del formulario
+                             *    (id puede ir vacío; el repositorio asigna UUID).
+                             * 2) En un rememberCoroutineScope().launch { ... } llamar:
+                             *      RepositorioPropiedades.publicarPropiedad(propiedad)
+                             * 3) Si Result.isSuccess, mostrar el diálogo; si no, errorMessage.
+                             * 4) Validar precio > 0, área > 0, habitaciones >= 1 (extra).
+                             * El método del repositorio YA está implementado (local + Supabase).
+                             * Ver también TAREAS_EQUIPO.md (tarea Mariana #6).
+                             */
                             showSuccessDialog = true
                         }
                     }

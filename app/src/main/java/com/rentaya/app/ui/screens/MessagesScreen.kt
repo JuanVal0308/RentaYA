@@ -30,6 +30,7 @@ fun MessagesScreen(
             title = { Text("Mensajes") }
         )
 
+        // TODO(equipo - Mariana): Mejorar empty state (ícono, texto y CTA hacia Buscar)
         if (messages.isEmpty()) {
             Box(
                 modifier = Modifier.fillMaxSize(),

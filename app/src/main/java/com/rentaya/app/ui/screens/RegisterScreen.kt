@@ -12,9 +12,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.rentaya.app.data.SampleData
 import com.rentaya.app.data.UserPreferences
-import com.rentaya.app.data.model.User
+import com.rentaya.app.data.repositorio.RepositorioUsuarios
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,6 +30,7 @@ fun RegisterScreen(
     var passwordVisible by remember { mutableStateOf(false) }
     var acceptTerms by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
+    var cargando by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     Column(
@@ -63,11 +63,13 @@ fun RegisterScreen(
             label = { Text("Nombre") },
             leadingIcon = { Icon(Icons.Default.Person, null) },
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            singleLine = true,
+            enabled = !cargando
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // TODO(equipo - Steve): Validar formato de correo (mensaje de error en español)
         OutlinedTextField(
             value = email,
             onValueChange = { 
@@ -78,11 +80,13 @@ fun RegisterScreen(
             leadingIcon = { Icon(Icons.Default.Email, null) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            singleLine = true,
+            enabled = !cargando
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // TODO(equipo - Steve): Validar teléfono colombiano (10 dígitos)
         OutlinedTextField(
             value = phone,
             onValueChange = { 
@@ -93,7 +97,8 @@ fun RegisterScreen(
             leadingIcon = { Icon(Icons.Default.Phone, null) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            singleLine = true,
+            enabled = !cargando
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -117,7 +122,8 @@ fun RegisterScreen(
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            singleLine = true,
+            enabled = !cargando
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -127,7 +133,8 @@ fun RegisterScreen(
         ) {
             Checkbox(
                 checked = acceptTerms,
-                onCheckedChange = { acceptTerms = it }
+                onCheckedChange = { acceptTerms = it },
+                enabled = !cargando
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
@@ -156,24 +163,45 @@ fun RegisterScreen(
                     !acceptTerms -> {
                         errorMessage = "Debes aceptar los términos y condiciones"
                     }
-                    SampleData.isEmailRegistered(email) -> {
-                        errorMessage = "Este correo ya está registrado"
-                    }
                     else -> {
-                        val user = User(email, name, phone, password)
-                        SampleData.registerUser(user)
+                        cargando = true
+                        errorMessage = ""
                         scope.launch {
-                            userPreferences.login(email, name, phone)
-                            onRegisterSuccess()
+                            val resultado = RepositorioUsuarios.registrar(
+                                nombre = name.trim(),
+                                correo = email.trim(),
+                                telefono = phone.trim(),
+                                clave = password
+                            )
+                            cargando = false
+                            resultado.fold(
+                                onSuccess = { user ->
+                                    userPreferences.login(user.email, user.name, user.phone)
+                                    onRegisterSuccess()
+                                },
+                                onFailure = { error ->
+                                    errorMessage = error.message
+                                        ?: "No se pudo crear la cuenta"
+                                }
+                            )
                         }
                     }
                 }
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp)
+                .height(56.dp),
+            enabled = !cargando
         ) {
-            Text("Crear Cuenta")
+            if (cargando) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Text("Crear Cuenta")
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -183,7 +211,7 @@ fun RegisterScreen(
             horizontalArrangement = Arrangement.Center
         ) {
             Text("¿Ya tienes cuenta? ")
-            TextButton(onClick = onBack) {
+            TextButton(onClick = onBack, enabled = !cargando) {
                 Text("Inicia sesión")
             }
         }

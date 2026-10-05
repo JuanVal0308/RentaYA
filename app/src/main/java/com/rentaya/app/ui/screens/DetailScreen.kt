@@ -15,6 +15,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.rentaya.app.data.SampleData
+import com.rentaya.app.data.repositorio.RepositorioPropiedades
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -23,7 +24,7 @@ fun DetailScreen(
     onBack: () -> Unit,
     onContact: (String) -> Unit
 ) {
-    val property = remember { SampleData.properties.find { it.id == propertyId } }
+    val property = remember { RepositorioPropiedades.obtenerPorId(propertyId) }
     var isFavorite by remember { mutableStateOf(SampleData.isFavorite(propertyId)) }
 
     if (property == null) {

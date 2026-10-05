@@ -94,7 +94,7 @@ fun ProfileScreen(
                     headlineContent = { Text("Mis publicaciones") },
                     leadingContent = { Icon(Icons.Default.Home, null) },
                     trailingContent = { Icon(Icons.Default.ChevronRight, null) },
-                    modifier = Modifier.clickable(onClick = { /* TODO(equipo): Implementar vista de mis publicaciones */ })
+                    modifier = Modifier.clickable(onClick = { /* TODO(equipo - Mariana): Navegar a MyPropertiesScreen (Mis publicaciones) */ })
                 )
                 HorizontalDivider()
                 ListItem(

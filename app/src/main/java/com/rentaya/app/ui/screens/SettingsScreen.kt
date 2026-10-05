@@ -116,7 +116,7 @@ fun SettingsScreen(
                     headlineContent = { Text("Acerca de") },
                     leadingContent = { Icon(Icons.Default.Info, null) },
                     trailingContent = { Icon(Icons.Default.ChevronRight, null) },
-                    modifier = Modifier.clickable { /* TODO(equipo): Implementar pantalla Acerca de */ }
+                    modifier = Modifier.clickable { /* TODO(equipo - Steve): Navegar a AboutScreen (Acerca de) */ }
                 )
                 HorizontalDivider()
                 ListItem(

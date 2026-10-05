@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.rentaya.app.data.SampleData
+import com.rentaya.app.data.repositorio.RepositorioPropiedades
 import com.rentaya.app.data.model.ChatMessage
 import com.rentaya.app.data.model.Message
 
@@ -22,7 +23,7 @@ fun ChatScreen(
     propertyId: String,
     onBack: () -> Unit
 ) {
-    val property = remember { SampleData.properties.find { it.id == propertyId } }
+    val property = remember { RepositorioPropiedades.obtenerPorId(propertyId) }
     var messageText by remember { mutableStateOf("") }
     var messages by remember {
         mutableStateOf(

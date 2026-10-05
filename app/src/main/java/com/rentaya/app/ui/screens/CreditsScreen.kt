@@ -66,17 +66,19 @@ fun CreditsScreen(
                 role = "Desarrollador"
             )
 
-            // TODO(equipo): Agregar información del segundo integrante
+            // TODO(equipo - Steve): Reemplazar "Integrante 2" con tu nombre completo y rol
             TeamMemberCard(
                 name = "Integrante 2",
                 role = "Desarrollador"
             )
 
-            // TODO(equipo): Agregar información del tercer integrante
+            // TODO(equipo - Mariana): Reemplazar "Integrante 3" con tu nombre completo y rol
             TeamMemberCard(
                 name = "Integrante 3",
                 role = "Desarrollador"
             )
+
+            // TODO(equipo - Mariana): Añadir sección "Tecnologías usadas" (Kotlin, Compose, DataStore/Supabase)
 
             Spacer(modifier = Modifier.height(16.dp))
 
