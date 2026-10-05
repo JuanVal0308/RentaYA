@@ -132,7 +132,7 @@ Semilla SQL equivalente en [`docs/supabase/esquema.sql`](docs/supabase/esquema.s
 |------------|-----|-------|
 | **Juan Pablo Martinez Romero** | Desarrollador principal | Infraestructura, repositorios, marca, docs |
 | **Steve** | [TODO - nombre completo] | Ver [`TAREAS_EQUIPO.md`](TAREAS_EQUIPO.md) (≥10 commits) |
-| **Mariana** | [TODO - nombre completo] | Ver [`TAREAS_EQUIPO.md`](TAREAS_EQUIPO.md) (≥10 commits) |
+| **Mariana Osorio** | Ingeniera | Ver [`TAREAS_EQUIPO.md`](TAREAS_EQUIPO.md) (≥10 commits) |
 
 ## 📦 Publicación en Google Play
 
