@@ -2,7 +2,9 @@ package com.rentaya.app.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
@@ -11,6 +13,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+
+private val tecnologiasUsadas = listOf(
+    "Kotlin" to "Lenguaje de programación de la app",
+    "Jetpack Compose" to "Interfaz declarativa con Material 3",
+    "Navigation Compose" to "Navegación entre pantallas",
+    "DataStore" to "Sesión y preferencias guardadas en el dispositivo",
+    "Supabase" to "Autenticación y base de datos en la nube",
+    "OkHttp" to "Conexión HTTP con Supabase"
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,7 +44,8 @@ fun CreditsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(24.dp),
+                .padding(24.dp)
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
@@ -77,7 +89,24 @@ fun CreditsScreen(
                 role = "Ingeniera"
             )
 
-            // TODO(equipo - Mariana): Añadir sección "Tecnologías usadas" (Kotlin, Compose, DataStore/Supabase)
+            Text(
+                text = "Tecnologías usadas",
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            Card(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column {
+                    tecnologiasUsadas.forEachIndexed { index, (nombre, descripcion) ->
+                        if (index > 0) HorizontalDivider()
+                        ListItem(
+                            headlineContent = { Text(nombre) },
+                            supportingContent = { Text(descripcion) }
+                        )
+                    }
+                }
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
