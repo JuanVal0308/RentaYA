@@ -72,10 +72,9 @@ fun CreditsScreen(
                 role = "Desarrollador"
             )
 
-            // TODO(equipo - Mariana): Reemplazar "Integrante 3" con tu nombre completo y rol
             TeamMemberCard(
-                name = "Integrante 3",
-                role = "Desarrollador"
+                name = "Mariana Osorio",
+                role = "Ingeniera"
             )
 
             // TODO(equipo - Mariana): Añadir sección "Tecnologías usadas" (Kotlin, Compose, DataStore/Supabase)
