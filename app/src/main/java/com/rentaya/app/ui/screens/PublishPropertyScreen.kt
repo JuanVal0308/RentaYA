@@ -216,6 +216,10 @@ fun PublishPropertyScreen(
 
             Button(
                 onClick = {
+                    // null si el texto no cabe en un Int (número demasiado largo)
+                    val precio = price.toIntOrNull()
+                    val areaM2 = area.toIntOrNull()
+                    val habitaciones = bedrooms.toIntOrNull()
                     when {
                         title.isBlank() -> errorMessage = "El título es obligatorio"
                         description.isBlank() -> errorMessage = "La descripción es obligatoria"
@@ -224,23 +228,28 @@ fun PublishPropertyScreen(
                         bedrooms.isBlank() -> errorMessage = "Las habitaciones son obligatorias"
                         bathrooms.isBlank() -> errorMessage = "Los baños son obligatorios"
                         area.isBlank() -> errorMessage = "El área es obligatoria"
+                        precio == null || precio <= 0 ->
+                            errorMessage = "El precio debe ser un número válido mayor que 0"
+                        areaM2 == null || areaM2 <= 0 ->
+                            errorMessage = "El área debe ser un número válido mayor que 0"
+                        habitaciones == null || habitaciones < 1 ->
+                            errorMessage = "Debe tener al menos 1 habitación"
                         else -> {
                             val amenities = mutableListOf<String>()
                             if (hasParking) amenities.add("Parqueadero")
                             if (isFurnished) amenities.add("Amoblado")
                             if (hasGym) amenities.add("Gimnasio")
 
-                            // TODO(equipo - Mariana): Validar precio > 0, área > 0, habitaciones >= 1
                             val propiedad = Property(
                                 id = idPropiedad,
                                 title = title.trim(),
                                 description = description.trim(),
                                 type = selectedType,
-                                price = price.toIntOrNull() ?: 0,
+                                price = precio,
                                 neighborhood = neighborhood.trim(),
-                                bedrooms = bedrooms.toIntOrNull() ?: 0,
+                                bedrooms = habitaciones,
                                 bathrooms = bathrooms.toIntOrNull() ?: 0,
-                                area = area.toIntOrNull() ?: 0,
+                                area = areaM2,
                                 amenities = amenities,
                                 landlord = Landlord("Arrendador", 4.0f)
                             )
