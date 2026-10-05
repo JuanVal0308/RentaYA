@@ -21,6 +21,18 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        // Claves de Supabase desde local.properties (no se suben al repo).
+        // Si están vacías, la app funciona 100% offline con SampleData.
+        val localProps = Properties()
+        val localFile = rootProject.file("local.properties")
+        if (localFile.exists()) {
+            localFile.inputStream().use { localProps.load(it) }
+        }
+        val supabaseUrl = localProps.getProperty("SUPABASE_URL", "") ?: ""
+        val supabaseAnonKey = localProps.getProperty("SUPABASE_ANON_KEY", "") ?: ""
+        buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
+        buildConfigField("String", "SUPABASE_ANON_KEY", "\"$supabaseAnonKey\"")
     }
 
     val keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -64,6 +76,7 @@ android {
     
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     
     packaging {
@@ -96,6 +109,9 @@ dependencies {
     // Room for local database
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
+
+    // HTTP para Supabase REST + Auth (sin SDK pesado)
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
     
     // Testing
     testImplementation("junit:junit:4.13.2")

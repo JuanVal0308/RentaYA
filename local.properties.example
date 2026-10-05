@@ -1,0 +1,8 @@
+## Copia este archivo como local.properties (ya está en .gitignore).
+## Android Studio genera sdk.dir automáticamente; tú agregas las claves de Supabase.
+
+# sdk.dir=C:\\Users\\TU_USUARIO\\AppData\\Local\\Android\\Sdk
+
+# Opcional: deja vacío o omite estas líneas para modo 100% offline.
+SUPABASE_URL=https://TU_PROYECTO.supabase.co
+SUPABASE_ANON_KEY=tu_clave_anon_publica
