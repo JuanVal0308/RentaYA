@@ -22,15 +22,26 @@ android {
             useSupportLibrary = true
         }
 
-        // Claves de Supabase desde local.properties (no se suben al repo).
-        // Si están vacías, la app funciona 100% offline con SampleData.
+        // Claves Supabase: supabase.properties (en el repo, clave anon pública)
+        // y opcionalmente local.properties (override local, en .gitignore).
+        // Si ambas quedan vacías, la app funciona 100% offline con SampleData.
+        val supabaseProps = Properties()
+        val supabaseFile = rootProject.file("supabase.properties")
+        if (supabaseFile.exists()) {
+            supabaseFile.inputStream().use { supabaseProps.load(it) }
+        }
         val localProps = Properties()
         val localFile = rootProject.file("local.properties")
         if (localFile.exists()) {
             localFile.inputStream().use { localProps.load(it) }
         }
-        val supabaseUrl = localProps.getProperty("SUPABASE_URL", "") ?: ""
-        val supabaseAnonKey = localProps.getProperty("SUPABASE_ANON_KEY", "") ?: ""
+        fun propSupabase(clave: String): String {
+            val desdeLocal = localProps.getProperty(clave)?.takeIf { it.isNotBlank() }
+            val desdeRepo = supabaseProps.getProperty(clave)?.takeIf { it.isNotBlank() }
+            return desdeLocal ?: desdeRepo ?: ""
+        }
+        val supabaseUrl = propSupabase("SUPABASE_URL")
+        val supabaseAnonKey = propSupabase("SUPABASE_ANON_KEY")
         buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
         buildConfigField("String", "SUPABASE_ANON_KEY", "\"$supabaseAnonKey\"")
     }
