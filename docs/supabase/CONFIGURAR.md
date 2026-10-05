@@ -1,60 +1,43 @@
 # Configurar Supabase para RentaYa
 
-La app funciona **sin** Supabase (modo offline con `SampleData`).  
-Estas instrucciones activan auth y listado remoto cuando quieras.
+El repositorio ya incluye **`supabase.properties`** con la URL y la clave **anon** pública del proyecto.  
+Al abrir el proyecto en Android Studio, Gradle las inyecta en `BuildConfig` y la app habla con Supabase **sin pasos extra**.
 
-## 1. Crear el proyecto
+`local.properties` (generado por Android Studio, en `.gitignore`) puede **sobreescribir** esas claves si hace falta.  
+Nunca subas la clave `service_role`.
 
-1. Entra a [https://supabase.com](https://supabase.com) con la cuenta **`juanpa.martinezromero@gmail.com`**  
-   (no uses la cuenta de Google Play `juanpa.martinezro@gmail.com`).
-2. **New project** → nombre sugerido: `rentaya`.
-3. Elige región cercana (p. ej. South America / East US) y una contraseña fuerte de base de datos (guárdala en un gestor; **no** la subas al repo).
-4. Espera a que el proyecto quede listo.
+## Cómo correr en Android Studio
 
-## 2. Ejecutar el esquema
+1. Clona el repo: `git clone https://github.com/JuanVal0308/RentaYA.git` y ábrelo en Android Studio (**File → Open** sobre la carpeta raíz).
+2. Usa **JDK 17 o 21** (File → Settings → Build → Gradle → Gradle JDK). En el PC del curso suele estar Adoptium 21.
+3. Espera a que Gradle sincronice (el archivo `supabase.properties` ya trae URL y anon key).
+4. Crea o elige un emulador API 24+, o conecta un celular con **depuración USB**.
+5. Pulsa **Run 'app'** (Shift+F10).  
+   Compilar por terminal: `./gradlew assembleDebug` (Windows: `gradlew.bat assembleDebug`).
 
-1. En el panel: **SQL Editor** → **New query**.
-2. Copia y pega todo el contenido de [`esquema.sql`](esquema.sql).
-3. Pulsa **Run**. Debe crear tablas `perfiles`, `propiedades`, `favoritos`, políticas RLS y las 20 propiedades semilla.
+Registro e inicio de sesión van contra Supabase Auth (confirmación de correo desactivada en el proyecto).  
+La búsqueda intenta listar la tabla `propiedades`; si no hay red, cae a `SampleData` local.
 
-## 3. Copiar URL y clave anónima
+## Proyecto actual
 
-1. Ve a **Project Settings** → **API**.
-2. Copia:
-   - **Project URL** → `SUPABASE_URL`
-   - **anon public** key → `SUPABASE_ANON_KEY`  
-     (nunca subas la `service_role` al cliente Android ni al Git).
+- Cuenta: `juanpa.martinezromero@gmail.com`
+- URL: ver `supabase.properties` / panel Supabase → Settings → API
+- Tablas: `perfiles`, `propiedades` (20 semillas), `favoritos`
+- Confirm email: OFF
 
-## 4. Pegar en `local.properties`
+## Si creas otro proyecto desde cero
 
-En la raíz del repo (mismo nivel que `settings.gradle.kts`), edita o crea `local.properties`  
-(está en `.gitignore`; ver también `local.properties.example`):
+1. New project en Supabase con esa cuenta.
+2. SQL Editor → pegar y ejecutar [`esquema.sql`](esquema.sql).
+3. (Opcional) [`politica_borrado.sql`](politica_borrado.sql) para borrar publicaciones propias.
+4. Copiar URL + anon key a `supabase.properties` (o override en `local.properties`).
 
-```properties
-sdk.dir=C:\\Users\\TU_USUARIO\\AppData\\Local\\Android\\Sdk
-SUPABASE_URL=https://TU_PROYECTO.supabase.co
-SUPABASE_ANON_KEY=eyJhbGciOi...tu_anon_key
-```
-
-Luego en Android Studio: **Sync Project with Gradle Files** y vuelve a instalar la app.  
-`BuildConfig` inyecta esas cadenas en tiempo de compilación.
-
-## 5. Probar
-
-1. Registra un usuario nuevo desde la app (irá a Supabase Auth).
-2. Inicia sesión con ese correo.
-3. La búsqueda intentará listar `propiedades` por REST; si la red falla, cae a datos locales.
-4. Cuando Mariana conecte el formulario, `publicarPropiedad` insertará en la tabla remota (y siempre en la lista local).
-
-## 6. Semillas extra del equipo
+## Semillas extra del equipo
 
 - Steve: [`semillas_steve.sql`](semillas_steve.sql)  
 - Mariana: [`semillas_mariana.sql`](semillas_mariana.sql)  
 
-Después de agregar INSERTs, ejecútalos en el SQL Editor (ids distintos a 1–20).
-
 ## Notas de seguridad
 
-- Solo la clave **anon** va en el APK (protegida por RLS).
+- La clave **anon** es pública por diseño y va en el APK; RLS limita qué puede hacer cada rol.
 - No commits de `local.properties`, keystores ni `service_role`.
-- Auth por correo/contraseña de Supabase; en local sin claves se usa `SampleData` en memoria.

@@ -56,36 +56,31 @@ Las claves `SUPABASE_URL` y `SUPABASE_ANON_KEY` se leen de `local.properties` y 
 
 ## 🚀 Cómo ejecutar
 
+### Cómo correr en Android Studio (equipo)
+
+1. Clona y abre la carpeta raíz en **Android Studio** (File → Open).
+2. **JDK 17 o 21** en Gradle JDK (recomendado: Eclipse Adoptium 21).
+3. Deja que sincronice Gradle. El archivo **`supabase.properties`** en la raíz ya trae `SUPABASE_URL` y la clave **anon** pública; la app conecta a Supabase al primer Run.
+4. Emulador (API 24+) o celular con **depuración USB** → Run 'app'.
+5. Opcional: `local.properties` solo necesita `sdk.dir` (Android Studio lo crea). Puedes sobreescribir ahí las claves Supabase si quieres.
+
+Guía completa de backend: [`docs/supabase/CONFIGURAR.md`](docs/supabase/CONFIGURAR.md).
+
 ### Requisitos
 
 - Android Studio Hedgehog (2023.1.1) o superior  
-- JDK 17  
+- JDK 17+ (21 OK)  
 - Android SDK 35  
 - Gradle 8.11.1 (wrapper)  
 
-### Pasos
+### Terminal
 
 ```bash
 git clone https://github.com/JuanVal0308/RentaYA.git
 cd RentaYA
-```
-
-Abre la carpeta en Android Studio y ejecuta la configuración `app`.
-
-```bash
-./gradlew assembleDebug
+./gradlew assembleDebug          # Linux/macOS
+# gradlew.bat assembleDebug      # Windows
 # APK: app/build/outputs/apk/debug/app-debug.apk
-```
-
-### Supabase (opcional)
-
-Ver guía completa: [`docs/supabase/CONFIGURAR.md`](docs/supabase/CONFIGURAR.md)  
-Cuenta del proyecto DB: `juanpa.martinezromero@gmail.com`.
-
-```properties
-# local.properties (no se sube a git)
-SUPABASE_URL=https://TU_PROYECTO.supabase.co
-SUPABASE_ANON_KEY=tu_clave_anon
 ```
 
 ### Firma de release
