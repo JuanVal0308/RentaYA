@@ -40,7 +40,6 @@ object SampleData {
     }
     
     // TODO(equipo - Steve): Agregar 3 apartamentos (Aranjuez, Manrique, Robledo) y 2 casas (Bello, Itagüí)
-    // TODO(equipo - Mariana): Agregar 2 cuartos (Buenos Aires, Castilla)
     // También agregar INSERTs equivalentes en docs/supabase/semillas_steve.sql o semillas_mariana.sql
     val properties = listOf(
         Property(
@@ -341,6 +340,32 @@ object SampleData {
             area = 54,
             amenities = listOf("Parqueadero"),
             landlord = Landlord("Natalia Zapata", 4.3f, "322 333 4455")
+        ),
+        Property(
+            id = "mariana-34",
+            title = "Cuarto económico en Buenos Aires",
+            description = "Habitación amoblada en casa de familia, a pocas cuadras del tranvía de Ayacucho. Servicios e internet incluidos.",
+            type = PropertyType.CUARTO,
+            price = 580000,
+            neighborhood = "Buenos Aires",
+            bedrooms = 1,
+            bathrooms = 1,
+            area = 16,
+            amenities = listOf("Amoblado"),
+            landlord = Landlord("Gloria Henao", 4.5f, "323 444 5566")
+        ),
+        Property(
+            id = "mariana-35",
+            title = "Cuarto económico en Castilla",
+            description = "Habitación independiente con baño compartido, cerca a la estación Tricentenario del metro. Ideal para estudiantes.",
+            type = PropertyType.CUARTO,
+            price = 560000,
+            neighborhood = "Castilla",
+            bedrooms = 1,
+            bathrooms = 1,
+            area = 14,
+            amenities = listOf(),
+            landlord = Landlord("Óscar Muñoz", 4.2f, "324 555 6677")
         )
     )
 }
