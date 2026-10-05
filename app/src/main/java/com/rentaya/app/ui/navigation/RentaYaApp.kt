@@ -11,8 +11,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
+import com.rentaya.app.data.SampleData
 import com.rentaya.app.data.UserPreferences
 import com.rentaya.app.ui.screens.*
+import kotlinx.coroutines.flow.first
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -23,6 +25,14 @@ fun RentaYaApp(
     val navController = rememberNavController()
     val currentRoute by navController.currentBackStackEntryAsState()
     val route = currentRoute?.destination?.route
+
+    // Favoritos: carga los guardados en DataStore y luego guarda cada cambio.
+    LaunchedEffect(Unit) {
+        SampleData.loadFavorites(userPreferences.favoriteIds.first())
+        SampleData.favoritesFlow.collect { ids ->
+            userPreferences.setFavoriteIds(ids)
+        }
+    }
 
     val showBottomBar = route in listOf(
         Screen.Search.route,

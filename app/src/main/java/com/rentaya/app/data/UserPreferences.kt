@@ -18,6 +18,7 @@ class UserPreferences(private val context: Context) {
         val USER_PHONE = stringPreferencesKey("user_phone")
         val DARK_MODE = booleanPreferencesKey("dark_mode")
         val NOTIFICATIONS_ENABLED = booleanPreferencesKey("notifications_enabled")
+        val FAVORITE_IDS = stringSetPreferencesKey("favorite_ids")
     }
     
     val isLoggedIn: Flow<Boolean> = context.dataStore.data
@@ -44,7 +45,12 @@ class UserPreferences(private val context: Context) {
         .map { preferences ->
             preferences[PreferencesKeys.NOTIFICATIONS_ENABLED] ?: true
         }
-    
+
+    val favoriteIds: Flow<Set<String>> = context.dataStore.data
+        .map { preferences ->
+            preferences[PreferencesKeys.FAVORITE_IDS] ?: emptySet()
+        }
+
     suspend fun login(email: String, name: String, phone: String) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKeys.IS_LOGGED_IN] = true
@@ -72,6 +78,12 @@ class UserPreferences(private val context: Context) {
     suspend fun setNotifications(enabled: Boolean) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKeys.NOTIFICATIONS_ENABLED] = enabled
+        }
+    }
+
+    suspend fun setFavoriteIds(ids: Set<String>) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.FAVORITE_IDS] = ids
         }
     }
 }

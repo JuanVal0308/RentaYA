@@ -1,13 +1,20 @@
 package com.rentaya.app.data
 
 import com.rentaya.app.data.model.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 object SampleData {
-    
+
     private val registeredUsers = mutableMapOf<String, User>()
-    
-    private val favorites = mutableSetOf<String>()
-    
+
+    private val favorites = MutableStateFlow<Set<String>>(emptySet())
+
+    /** Favoritos en memoria; RentaYaApp guarda cada cambio en DataStore. */
+    val favoritesFlow: StateFlow<Set<String>> = favorites.asStateFlow()
+
     private val messages = mutableListOf<Message>()
     
     fun registerUser(user: User) {
@@ -22,17 +29,27 @@ object SampleData {
     fun isEmailRegistered(email: String): Boolean = registeredUsers.containsKey(email)
     
     fun toggleFavorite(propertyId: String) {
-        if (favorites.contains(propertyId)) {
-            favorites.remove(propertyId)
-        } else {
-            favorites.add(propertyId)
+        favorites.update { ids ->
+            if (propertyId in ids) ids - propertyId else ids + propertyId
         }
     }
-    
-    fun isFavorite(propertyId: String): Boolean = favorites.contains(propertyId)
-    
-    fun getFavorites(): Set<String> = favorites.toSet()
-    
+
+    fun isFavorite(propertyId: String): Boolean = propertyId in favorites.value
+
+    fun getFavorites(): Set<String> = favorites.value
+
+    private var favoritesLoaded = false
+
+    /**
+     * Suma a los favoritos en memoria los que estaban guardados en DataStore.
+     * Solo la primera vez: después la memoria manda y no se pisan cambios recientes.
+     */
+    fun loadFavorites(ids: Set<String>) {
+        if (favoritesLoaded) return
+        favoritesLoaded = true
+        favorites.update { it + ids }
+    }
+
     fun getMessages(): List<Message> = messages.toList()
     
     fun addMessage(message: Message) {
