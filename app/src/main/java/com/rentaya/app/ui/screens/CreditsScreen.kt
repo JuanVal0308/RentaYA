@@ -78,9 +78,8 @@ fun CreditsScreen(
                 role = "Desarrollador"
             )
 
-            // TODO(equipo - Steve): Reemplazar "Integrante 2" con tu nombre completo y rol
             TeamMemberCard(
-                name = "Integrante 2",
+                name = "Steve",
                 role = "Desarrollador"
             )
 

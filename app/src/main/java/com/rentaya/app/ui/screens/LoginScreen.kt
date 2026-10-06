@@ -28,6 +28,7 @@ fun LoginScreen(
     var passwordVisible by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
     var cargando by remember { mutableStateOf(false) }
+    var showForgotPasswordDialog by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     Column(
@@ -102,9 +103,8 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // TODO(equipo - Steve): Implementar diálogo de recuperación de contraseña
         TextButton(
-            onClick = { /* TODO(equipo - Steve): mostrar AlertDialog de recuperación */ },
+            onClick = { showForgotPasswordDialog = true },
             modifier = Modifier.align(Alignment.End),
             enabled = !cargando
         ) {
@@ -191,5 +191,20 @@ fun LoginScreen(
                 Text("Regístrate")
             }
         }
+    }
+
+    if (showForgotPasswordDialog) {
+        AlertDialog(
+            onDismissRequest = { showForgotPasswordDialog = false },
+            title = { Text("Recuperar contraseña") },
+            text = {
+                Text("La recuperación de contraseña no está disponible en la versión offline.")
+            },
+            confirmButton = {
+                TextButton(onClick = { showForgotPasswordDialog = false }) {
+                    Text("Entendido")
+                }
+            }
+        )
     }
 }

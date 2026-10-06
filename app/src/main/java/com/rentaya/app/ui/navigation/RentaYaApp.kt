@@ -241,12 +241,19 @@ fun RentaYaApp(
             composable(Screen.Settings.route) {
                 SettingsScreen(
                     onBack = { navController.navigateUp() },
+                    onAbout = { navController.navigate(Screen.About.route) },
                     onLogout = {
                         navController.navigate(Screen.Onboarding.route) {
                             popUpTo(0) { inclusive = true }
                         }
                     },
                     userPreferences = userPreferences
+                )
+            }
+
+            composable(Screen.About.route) {
+                AboutScreen(
+                    onBack = { navController.navigateUp() }
                 )
             }
             

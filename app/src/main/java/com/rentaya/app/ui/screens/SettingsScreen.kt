@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun SettingsScreen(
     onBack: () -> Unit,
+    onAbout: () -> Unit,
     onLogout: () -> Unit,
     userPreferences: UserPreferences
 ) {
@@ -117,7 +118,7 @@ fun SettingsScreen(
                     headlineContent = { Text("Acerca de") },
                     leadingContent = { Icon(Icons.Default.Info, null) },
                     trailingContent = { Icon(Icons.Default.ChevronRight, null) },
-                    modifier = Modifier.clickable { /* TODO(equipo - Steve): Navegar a AboutScreen (Acerca de) */ }
+                    modifier = Modifier.clickable(onClick = onAbout)
                 )
                 HorizontalDivider()
                 ListItem(
