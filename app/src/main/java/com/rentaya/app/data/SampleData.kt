@@ -56,8 +56,6 @@ object SampleData {
         messages.add(message)
     }
     
-    // TODO(equipo - Steve): Agregar 3 apartamentos (Aranjuez, Manrique, Robledo) y 2 casas (Bello, Itagüí)
-    // También agregar INSERTs equivalentes en docs/supabase/semillas_steve.sql o semillas_mariana.sql
     val properties = listOf(
         Property(
             id = "1",
@@ -383,6 +381,71 @@ object SampleData {
             area = 14,
             amenities = listOf(),
             landlord = Landlord("Óscar Muñoz", 4.2f, "324 555 6677")
+        ),
+        Property(
+            id = "steve-21",
+            title = "Apto familiar en Aranjuez",
+            description = "Apartamento iluminado cerca al Parque de Aranjuez, con fácil acceso a rutas de transporte y comercio local.",
+            type = PropertyType.APARTAMENTO,
+            price = 1250000,
+            neighborhood = "Aranjuez",
+            bedrooms = 2,
+            bathrooms = 1,
+            area = 55,
+            amenities = listOf("Parqueadero"),
+            landlord = Landlord("Daniela Vélez", 4.3f, "325 101 2020")
+        ),
+        Property(
+            id = "steve-22",
+            title = "Apto renovado en Manrique",
+            description = "Apartamento recién renovado cerca a la estación Gardel del Metroplús, ideal para una pareja o familia pequeña.",
+            type = PropertyType.APARTAMENTO,
+            price = 980000,
+            neighborhood = "Manrique",
+            bedrooms = 2,
+            bathrooms = 1,
+            area = 50,
+            amenities = listOf("Amoblado"),
+            landlord = Landlord("Mateo Londoño", 4.1f, "325 202 3030")
+        ),
+        Property(
+            id = "steve-23",
+            title = "Apto en unidad cerrada de Robledo",
+            description = "Apartamento en unidad residencial con zonas verdes, portería permanente y acceso cercano a universidades.",
+            type = PropertyType.APARTAMENTO,
+            price = 1380000,
+            neighborhood = "Robledo",
+            bedrooms = 3,
+            bathrooms = 2,
+            area = 67,
+            amenities = listOf("Parqueadero", "Gimnasio"),
+            landlord = Landlord("Valentina Ríos", 4.6f, "325 303 4040")
+        ),
+        Property(
+            id = "steve-24",
+            title = "Casa amplia en Bello",
+            description = "Casa de dos niveles en un sector residencial de Bello, con patio y espacios cómodos para toda la familia.",
+            type = PropertyType.CASA,
+            price = 1650000,
+            neighborhood = "Bello",
+            bedrooms = 4,
+            bathrooms = 2,
+            area = 118,
+            amenities = listOf("Parqueadero"),
+            landlord = Landlord("Santiago Mejía", 4.5f, "325 404 5050")
+        ),
+        Property(
+            id = "steve-25",
+            title = "Casa moderna en Itagüí",
+            description = "Casa remodelada cerca al parque principal de Itagüí, con terraza, cocina integral y buenas rutas de acceso.",
+            type = PropertyType.CASA,
+            price = 2050000,
+            neighborhood = "Itagüí",
+            bedrooms = 3,
+            bathrooms = 3,
+            area = 125,
+            amenities = listOf("Parqueadero", "Amoblado"),
+            landlord = Landlord("Paula Castaño", 4.7f, "325 505 6060")
         )
     )
 }
