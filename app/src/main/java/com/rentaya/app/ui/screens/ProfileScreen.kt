@@ -12,7 +12,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import com.rentaya.app.BuildConfig
 import com.rentaya.app.data.UserPreferences
+import com.rentaya.app.data.remoto.ClienteSupabase
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -23,15 +25,20 @@ fun ProfileScreen(
     onCredits: () -> Unit,
     onPublish: () -> Unit,
     onMyProperties: () -> Unit,
+    onVerificarCorreo: (String) -> Unit = {},
     userPreferences: UserPreferences
 ) {
     val scope = rememberCoroutineScope()
     var userName by remember { mutableStateOf("") }
     var userEmail by remember { mutableStateOf("") }
+    var correoConfirmado by remember { mutableStateOf(true) }
+    var avisoVerificacion by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         userName = userPreferences.userName.first()
         userEmail = userPreferences.userEmail.first()
+        correoConfirmado = userPreferences.emailConfirmed.first() &&
+            (ClienteSupabase.puedePublicar() || !ClienteSupabase.estaConfigurado)
     }
 
     Column(
@@ -76,6 +83,14 @@ fun ProfileScreen(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+            if (!correoConfirmado && !BuildConfig.DEBUG_OMITIR_VERIFICACION_CORREO) {
+                Spacer(modifier = Modifier.height(12.dp))
+                AssistChip(
+                    onClick = { onVerificarCorreo(userEmail) },
+                    label = { Text("Correo sin confirmar") },
+                    leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) }
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -88,7 +103,13 @@ fun ProfileScreen(
                     headlineContent = { Text("Publicar inmueble") },
                     leadingContent = { Icon(Icons.Default.Add, null) },
                     trailingContent = { Icon(Icons.Default.ChevronRight, null) },
-                    modifier = Modifier.clickable(onClick = onPublish)
+                    modifier = Modifier.clickable {
+                        if (!ClienteSupabase.puedePublicar()) {
+                            avisoVerificacion = true
+                        } else {
+                            onPublish()
+                        }
+                    }
                 )
                 HorizontalDivider()
                 ListItem(
@@ -113,5 +134,26 @@ fun ProfileScreen(
                 )
             }
         }
+    }
+
+    if (avisoVerificacion) {
+        AlertDialog(
+            onDismissRequest = { avisoVerificacion = false },
+            title = { Text("Confirma tu correo") },
+            text = { Text("Para publicar un inmueble debes verificar tu correo. Revisa la bandeja de entrada o reenvía el enlace.") },
+            confirmButton = {
+                Button(onClick = {
+                    avisoVerificacion = false
+                    onVerificarCorreo(userEmail)
+                }) {
+                    Text("Revisar correo")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { avisoVerificacion = false }) {
+                    Text("Ahora no")
+                }
+            }
+        )
     }
 }

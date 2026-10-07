@@ -447,5 +447,8 @@ object SampleData {
             amenities = listOf("Parqueadero", "Amoblado"),
             landlord = Landlord("Paula Castaño", 4.7f, "325 505 6060")
         )
-    )
+    ).map { propiedad ->
+        val (lat, lng) = CoordenadasBarrios.de(propiedad.neighborhood, propiedad.id)
+        propiedad.copy(latitude = lat, longitude = lng)
+    }
 }

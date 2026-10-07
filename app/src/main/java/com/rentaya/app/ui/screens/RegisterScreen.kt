@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun RegisterScreen(
     onRegisterSuccess: () -> Unit,
+    onNeedsVerification: (String) -> Unit,
     onBack: () -> Unit,
     userPreferences: UserPreferences
 ) {
@@ -182,9 +183,18 @@ fun RegisterScreen(
                             )
                             cargando = false
                             resultado.fold(
-                                onSuccess = { user ->
-                                    userPreferences.login(user.email, user.name, user.phone)
-                                    onRegisterSuccess()
+                                onSuccess = { auth ->
+                                    if (auth.requiereConfirmacion) {
+                                        onNeedsVerification(auth.usuario.email)
+                                    } else {
+                                        userPreferences.login(
+                                            auth.usuario.email,
+                                            auth.usuario.name,
+                                            auth.usuario.phone,
+                                            auth.usuario.emailConfirmed
+                                        )
+                                        onRegisterSuccess()
+                                    }
                                 },
                                 onFailure = { error ->
                                     errorMessage = error.message

@@ -1,29 +1,53 @@
 package com.rentaya.app.ui.screens
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
+import coil.compose.AsyncImage
+import com.rentaya.app.BuildConfig
+import com.rentaya.app.data.CoordenadasBarrios
+import com.rentaya.app.data.UserPreferences
 import com.rentaya.app.data.model.Landlord
 import com.rentaya.app.data.model.Property
 import com.rentaya.app.data.model.PropertyType
+import com.rentaya.app.data.remoto.ClienteSupabase
 import com.rentaya.app.data.repositorio.RepositorioPropiedades
+import com.rentaya.app.ui.components.MapaOsm
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.io.File
 import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PublishPropertyScreen(
     onBack: () -> Unit,
-    onSuccess: () -> Unit
+    onSuccess: () -> Unit,
+    onVerificarCorreo: () -> Unit = {},
+    userPreferences: UserPreferences? = null
 ) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var neighborhood by remember { mutableStateOf("") }
@@ -38,9 +62,52 @@ fun PublishPropertyScreen(
     var errorMessage by remember { mutableStateOf("") }
     var showSuccessDialog by remember { mutableStateOf(false) }
     var cargando by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
-    // Mismo id en cada intento: reintentar tras un error no duplica la publicación local.
+    var mensajeCarga by remember { mutableStateOf("Publicando…") }
+    var fotos by remember { mutableStateOf<List<String>>(emptyList()) }
+    var pinManual by remember { mutableStateOf(false) }
+    var latitud by remember { mutableStateOf(CoordenadasBarrios.LAT_CENTRO) }
+    var longitud by remember { mutableStateOf(CoordenadasBarrios.LNG_CENTRO) }
+    var fotoCamara by remember { mutableStateOf<Uri?>(null) }
     val idPropiedad = remember { UUID.randomUUID().toString() }
+
+    LaunchedEffect(neighborhood) {
+        if (!pinManual && neighborhood.isNotBlank()) {
+            val (lat, lng) = CoordenadasBarrios.de(neighborhood, idPropiedad)
+            latitud = lat
+            longitud = lng
+        }
+    }
+
+    val selectorGaleria = rememberLauncherForActivityResult(
+        ActivityResultContracts.PickMultipleVisualMedia(maxItems = 8)
+    ) { uris ->
+        if (uris.isNotEmpty()) {
+            fotos = (fotos + uris.map { it.toString() }).distinct().take(8)
+            errorMessage = ""
+        }
+    }
+
+    val tomadorFoto = rememberLauncherForActivityResult(
+        ActivityResultContracts.TakePicture()
+    ) { ok ->
+        if (ok) {
+            fotoCamara?.let { uri ->
+                fotos = (fotos + uri.toString()).distinct().take(8)
+            }
+        }
+    }
+
+    fun abrirCamara() {
+        val dir = File(context.cacheDir, "fotos").apply { mkdirs() }
+        val archivo = File(dir, "camara_${System.currentTimeMillis()}.jpg")
+        val uri = FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.fileprovider",
+            archivo
+        )
+        fotoCamara = uri
+        tomadorFoto.launch(uri)
+    }
 
     Scaffold(
         topBar = {
@@ -63,13 +130,80 @@ fun PublishPropertyScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
+                text = "Fotos del inmueble",
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(
+                "Elige 1 o más fotos. Si hay red se suben a Storage; si no, se ven en esta sesión.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                items(fotos) { uri ->
+                    Box {
+                        AsyncImage(
+                            model = uri,
+                            contentDescription = "Foto del inmueble",
+                            modifier = Modifier
+                                .size(96.dp)
+                                .clip(RoundedCornerShape(10.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+                        IconButton(
+                            onClick = { fotos = fotos.filterNot { it == uri } },
+                            modifier = Modifier.align(Alignment.TopEnd)
+                        ) {
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = "Quitar foto",
+                                tint = MaterialTheme.colorScheme.onPrimary
+                            )
+                        }
+                    }
+                }
+                item {
+                    OutlinedButton(
+                        onClick = {
+                            selectorGaleria.launch(
+                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                            )
+                        },
+                        modifier = Modifier.height(96.dp)
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(Icons.Default.PhotoLibrary, contentDescription = null)
+                            Text("Galería", style = MaterialTheme.typography.labelSmall)
+                        }
+                    }
+                }
+                item {
+                    OutlinedButton(
+                        onClick = { abrirCamara() },
+                        modifier = Modifier.height(96.dp)
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(Icons.Default.PhotoCamera, contentDescription = null)
+                            Text("Cámara", style = MaterialTheme.typography.labelSmall)
+                        }
+                    }
+                }
+            }
+            if (fotos.isEmpty()) {
+                Text(
+                    "Aún no hay fotos. Se usará una imagen de muestra según el tipo.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            Text(
                 text = "Información básica",
                 style = MaterialTheme.typography.titleMedium
             )
 
             OutlinedTextField(
                 value = title,
-                onValueChange = { 
+                onValueChange = {
                     title = it
                     errorMessage = ""
                 },
@@ -81,7 +215,7 @@ fun PublishPropertyScreen(
 
             OutlinedTextField(
                 value = description,
-                onValueChange = { 
+                onValueChange = {
                     description = it
                     errorMessage = ""
                 },
@@ -95,8 +229,9 @@ fun PublishPropertyScreen(
 
             OutlinedTextField(
                 value = neighborhood,
-                onValueChange = { 
+                onValueChange = {
                     neighborhood = it
+                    pinManual = false
                     errorMessage = ""
                 },
                 label = { Text("Barrio") },
@@ -104,15 +239,51 @@ fun PublishPropertyScreen(
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                items(CoordenadasBarrios.nombresSugeridos) { barrio ->
+                    FilterChip(
+                        selected = neighborhood.equals(barrio, ignoreCase = true),
+                        onClick = {
+                            neighborhood = barrio
+                            pinManual = false
+                        },
+                        label = { Text(barrio) }
+                    )
+                }
+            }
+
+            Text("Ubicación en el mapa", style = MaterialTheme.typography.titleMedium)
+            Text(
+                "Toca el mapa para ajustar el pin. Por defecto usamos el barrio.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            MapaOsm(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .clip(RoundedCornerShape(12.dp)),
+                pin = latitud to longitud,
+                zoom = 14.0,
+                permitirToque = true,
+                onToqueMapa = { lat, lng ->
+                    pinManual = true
+                    latitud = lat
+                    longitud = lng
+                }
+            )
+            Text(
+                "Lat ${"%.5f".format(latitud)} · Lng ${"%.5f".format(longitud)}",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
 
             Text(
                 text = "Tipo de propiedad",
                 style = MaterialTheme.typography.titleMedium
             )
 
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 PropertyType.values().forEach { type ->
                     FilterChip(
                         selected = selectedType == type,
@@ -133,7 +304,7 @@ fun PublishPropertyScreen(
             ) {
                 OutlinedTextField(
                     value = price,
-                    onValueChange = { 
+                    onValueChange = {
                         price = it.filter { char -> char.isDigit() }
                         errorMessage = ""
                     },
@@ -143,10 +314,9 @@ fun PublishPropertyScreen(
                     modifier = Modifier.weight(1f),
                     singleLine = true
                 )
-
                 OutlinedTextField(
                     value = area,
-                    onValueChange = { 
+                    onValueChange = {
                         area = it.filter { char -> char.isDigit() }
                         errorMessage = ""
                     },
@@ -163,7 +333,7 @@ fun PublishPropertyScreen(
             ) {
                 OutlinedTextField(
                     value = bedrooms,
-                    onValueChange = { 
+                    onValueChange = {
                         bedrooms = it.filter { char -> char.isDigit() }
                         errorMessage = ""
                     },
@@ -172,10 +342,9 @@ fun PublishPropertyScreen(
                     modifier = Modifier.weight(1f),
                     singleLine = true
                 )
-
                 OutlinedTextField(
                     value = bathrooms,
-                    onValueChange = { 
+                    onValueChange = {
                         bathrooms = it.filter { char -> char.isDigit() }
                         errorMessage = ""
                     },
@@ -191,17 +360,15 @@ fun PublishPropertyScreen(
                 style = MaterialTheme.typography.titleMedium
             )
 
-            Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(checked = hasParking, onCheckedChange = { hasParking = it })
                 Text("Parqueadero")
             }
-
-            Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(checked = isFurnished, onCheckedChange = { isFurnished = it })
                 Text("Amoblado")
             }
-
-            Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(checked = hasGym, onCheckedChange = { hasGym = it })
                 Text("Gimnasio")
             }
@@ -213,14 +380,24 @@ fun PublishPropertyScreen(
                     style = MaterialTheme.typography.bodySmall
                 )
             }
+            if (cargando) {
+                Text(
+                    text = mensajeCarga,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
 
             Button(
                 onClick = {
-                    // null si el texto no cabe en un Int (número demasiado largo)
                     val precio = price.toIntOrNull()
                     val areaM2 = area.toIntOrNull()
                     val habitaciones = bedrooms.toIntOrNull()
                     when {
+                        !ClienteSupabase.puedePublicar() -> {
+                            errorMessage = "Confirma tu correo para publicar inmuebles."
+                            onVerificarCorreo()
+                        }
                         title.isBlank() -> errorMessage = "El título es obligatorio"
                         description.isBlank() -> errorMessage = "La descripción es obligatoria"
                         neighborhood.isBlank() -> errorMessage = "El barrio es obligatorio"
@@ -240,22 +417,36 @@ fun PublishPropertyScreen(
                             if (isFurnished) amenities.add("Amoblado")
                             if (hasGym) amenities.add("Gimnasio")
 
-                            val propiedad = Property(
-                                id = idPropiedad,
-                                title = title.trim(),
-                                description = description.trim(),
-                                type = selectedType,
-                                price = precio,
-                                neighborhood = neighborhood.trim(),
-                                bedrooms = habitaciones,
-                                bathrooms = bathrooms.toIntOrNull() ?: 0,
-                                area = areaM2,
-                                amenities = amenities,
-                                landlord = Landlord("Arrendador", 4.0f)
-                            )
                             cargando = true
                             errorMessage = ""
+                            mensajeCarga = if (fotos.isNotEmpty()) "Subiendo fotos…" else "Publicando…"
                             scope.launch {
+                                val nombre = userPreferences?.userName?.first()?.ifBlank { "Arrendador" }
+                                    ?: "Arrendador"
+                                val telefono = ""
+                                val imagenes = RepositorioPropiedades.resolverImagenesPublicacion(
+                                    context = context,
+                                    idPropiedad = idPropiedad,
+                                    uris = fotos
+                                )
+                                mensajeCarga = "Publicando inmueble…"
+                                val propiedad = Property(
+                                    id = idPropiedad,
+                                    title = title.trim(),
+                                    description = description.trim(),
+                                    type = selectedType,
+                                    price = precio,
+                                    neighborhood = neighborhood.trim(),
+                                    bedrooms = habitaciones,
+                                    bathrooms = bathrooms.toIntOrNull() ?: 0,
+                                    area = areaM2,
+                                    amenities = amenities,
+                                    landlord = Landlord(nombre, 4.0f, telefono),
+                                    imageRes = imagenes.firstOrNull() ?: "sample",
+                                    imagenes = imagenes,
+                                    latitude = latitud,
+                                    longitude = longitud
+                                )
                                 val resultado = RepositorioPropiedades.publicarPropiedad(propiedad)
                                 cargando = false
                                 resultado.fold(
@@ -283,6 +474,14 @@ fun PublishPropertyScreen(
                 } else {
                     Text("Publicar")
                 }
+            }
+
+            if (BuildConfig.DEBUG && BuildConfig.DEBUG_OMITIR_VERIFICACION_CORREO) {
+                Text(
+                    "Debug: se omite la verificación de correo (solo depuración).",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.error
+                )
             }
 
             Spacer(modifier = Modifier.height(16.dp))

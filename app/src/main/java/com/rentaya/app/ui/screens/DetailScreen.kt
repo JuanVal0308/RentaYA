@@ -2,6 +2,8 @@ package com.rentaya.app.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -16,6 +18,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.rentaya.app.data.SampleData
 import com.rentaya.app.data.repositorio.RepositorioPropiedades
+import com.rentaya.app.ui.components.ImagenPropiedad
+import com.rentaya.app.ui.components.MapaOsm
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -26,6 +30,8 @@ fun DetailScreen(
 ) {
     val property = remember { RepositorioPropiedades.obtenerPorId(propertyId) }
     var isFavorite by remember { mutableStateOf(SampleData.isFavorite(propertyId)) }
+    val galeria = remember(property) { property?.galeria().orEmpty() }
+    val pagerState = rememberPagerState(pageCount = { galeria.size.coerceAtLeast(1) })
 
     if (property == null) {
         Box(
@@ -85,15 +91,35 @@ fun DetailScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(300.dp)
-                        .background(MaterialTheme.colorScheme.surfaceVariant),
-                    contentAlignment = Alignment.Center
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
                 ) {
-                    Icon(
-                        Icons.Default.Home,
-                        contentDescription = null,
-                        modifier = Modifier.size(120.dp),
-                        tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
-                    )
+                    HorizontalPager(
+                        state = pagerState,
+                        modifier = Modifier.fillMaxSize()
+                    ) { page ->
+                        ImagenPropiedad(
+                            modelo = galeria.getOrNull(page) ?: property.imagenPrincipal(),
+                            modifier = Modifier.fillMaxSize(),
+                            contentDescription = property.title,
+                            id = property.id,
+                            tipo = property.type
+                        )
+                    }
+                    if (galeria.size > 1) {
+                        Surface(
+                            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .padding(12.dp)
+                        ) {
+                            Text(
+                                "${pagerState.currentPage + 1}/${galeria.size}",
+                                style = MaterialTheme.typography.labelSmall,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
+                        }
+                    }
                 }
 
                 IconButton(
@@ -204,23 +230,27 @@ fun DetailScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                OutlinedCard(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(Icons.Default.Map, null, modifier = Modifier.size(40.dp))
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Text(
-                            text = "× Ver mapa ×",
-                            style = MaterialTheme.typography.titleSmall
-                        )
-                    }
-                }
+                Text(
+                    text = "Ubicación",
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                MapaOsm(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp)
+                        .clip(RoundedCornerShape(12.dp)),
+                    propiedades = listOf(property),
+                    pin = property.coordenada(),
+                    zoom = 14.5,
+                    interactivo = true
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = property.neighborhood,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 

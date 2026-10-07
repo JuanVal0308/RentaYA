@@ -1,5 +1,7 @@
 package com.rentaya.app.data.repositorio
 
+import android.content.Context
+import android.net.Uri
 import com.rentaya.app.data.SampleData
 import com.rentaya.app.data.model.Property
 import com.rentaya.app.data.remoto.ClienteSupabase
@@ -58,12 +60,55 @@ object RepositorioPropiedades {
     }
 
     /**
+     * Sube fotos a Storage si hay sesión remota; si no, conserva las Uri locales
+     * para mostrarlas en esta sesión (offline).
+     */
+    suspend fun resolverImagenesPublicacion(
+        context: Context,
+        idPropiedad: String,
+        uris: List<String>
+    ): List<String> {
+        if (uris.isEmpty()) return emptyList()
+        val puedeSubir = ClienteSupabase.estaConfigurado &&
+            !ClienteSupabase.tokenAcceso.isNullOrBlank()
+        if (!puedeSubir) {
+            return uris
+        }
+        val resultado = mutableListOf<String>()
+        uris.forEachIndexed { index, uriTexto ->
+            val uri = Uri.parse(uriTexto)
+            val esRemota = uriTexto.startsWith("http://") || uriTexto.startsWith("https://")
+            if (esRemota) {
+                resultado.add(uriTexto)
+                return@forEachIndexed
+            }
+            val bytes = runCatching {
+                context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+            }.getOrNull()
+            if (bytes == null || bytes.isEmpty()) {
+                resultado.add(uriTexto)
+                return@forEachIndexed
+            }
+            val tipo = context.contentResolver.getType(uri) ?: "image/jpeg"
+            val ext = when {
+                tipo.contains("png") -> "png"
+                tipo.contains("webp") -> "webp"
+                else -> "jpg"
+            }
+            val remoto = ClienteSupabase.subirImagenInmueble(
+                bytes = bytes,
+                nombreArchivo = "$idPropiedad/${index + 1}.$ext",
+                contentType = tipo
+            )
+            resultado.add(remoto.getOrDefault(uriTexto))
+        }
+        return resultado
+    }
+
+    /**
      * Publica una propiedad. Siempre la agrega a la lista local mutable.
      * Si Supabase está configurado, también la inserta en la tabla `propiedades`
      * con [ClienteSupabase.idUsuarioActual] como id_propietario.
-     *
-     * La pantalla PublishPropertyScreen debe llamar este método
-     * (tarea pendiente del equipo — ver TODO(equipo - Mariana)).
      */
     suspend fun publicarPropiedad(propiedad: Property): Result<Property> {
         val conId = if (propiedad.id.isBlank()) {
@@ -83,7 +128,6 @@ object RepositorioPropiedades {
             idPropietario = ClienteSupabase.idUsuarioActual
         )
         return if (remoto.isSuccess) {
-            // Invalidar caché para forzar refresco en el próximo listar().
             cacheRemota = null
             Result.success(conId)
         } else {

@@ -16,7 +16,7 @@ import com.rentaya.app.data.repositorio.RepositorioPropiedades
 fun FavoritesScreen(
     onPropertyClick: (String) -> Unit
 ) {
-    val favoriteIds = remember { SampleData.getFavorites() }
+    val favoriteIds by SampleData.favoritesFlow.collectAsState()
     val favoriteProperties = remember(favoriteIds) {
         RepositorioPropiedades.listarLocal().filter { it.id in favoriteIds }
     }

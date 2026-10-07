@@ -19,6 +19,8 @@ import com.rentaya.app.data.SampleData
 import com.rentaya.app.data.repositorio.RepositorioPropiedades
 import com.rentaya.app.data.model.Property
 import com.rentaya.app.data.model.PropertyType
+import com.rentaya.app.ui.components.ImagenPrincipalPropiedad
+import com.rentaya.app.ui.components.MapaOsm
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -38,9 +40,12 @@ fun SearchScreen(
             maximumFractionDigits = 0
         }
     }
+    var propiedadEnMapa by remember { mutableStateOf<Property?>(null) }
+    var cargandoLista by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
         propiedades = RepositorioPropiedades.listar()
+        cargandoLista = false
     }
 
     val filteredProperties = remember(searchQuery, selectedType, precioMaximo, propiedades) {
@@ -131,30 +136,26 @@ fun SearchScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp)
+                .height(240.dp)
                 .clip(RoundedCornerShape(16.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant),
-            contentAlignment = Alignment.Center
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
+            MapaOsm(
+                modifier = Modifier.fillMaxSize(),
+                propiedades = filteredProperties,
+                zoom = 11.8,
+                onMarcador = { propiedadEnMapa = it }
+            )
+            Surface(
+                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+                shape = RoundedCornerShape(20.dp),
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(8.dp)
             ) {
-                Icon(
-                    Icons.Default.Map,
-                    contentDescription = null,
-                    modifier = Modifier.size(48.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    "× Mapa de Medellín ×",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    "${filteredProperties.size} propiedades",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    "${filteredProperties.size} inmuebles en Medellín",
+                    style = MaterialTheme.typography.labelMedium,
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
                 )
             }
         }
@@ -174,6 +175,16 @@ fun SearchScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            if (cargandoLista) {
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            }
+            if (filteredProperties.isEmpty() && !cargandoLista) {
+                Text(
+                    "No hay propiedades que coincidan con tu búsqueda.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
             filteredProperties.take(5).forEach { property ->
                 PropertyCard(
                     property = property,
@@ -187,6 +198,35 @@ fun SearchScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Ver ${filteredProperties.size - 5} más")
+                }
+            }
+        }
+    }
+
+    propiedadEnMapa?.let { seleccionada ->
+        ModalBottomSheet(onDismissRequest = { propiedadEnMapa = null }) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .padding(bottom = 28.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(seleccionada.title, style = MaterialTheme.typography.titleMedium)
+                Text(
+                    "${formatPrice(seleccionada.price)}/mes · ${seleccionada.neighborhood}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Button(
+                    onClick = {
+                        val id = seleccionada.id
+                        propiedadEnMapa = null
+                        onPropertyClick(id)
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Ver detalle")
                 }
             }
         }
@@ -224,13 +264,10 @@ fun PropertyCard(
                     .height(150.dp)
                     .background(MaterialTheme.colorScheme.surfaceVariant)
             ) {
-                Icon(
-                    Icons.Default.Home,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .size(64.dp),
-                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+                ImagenPrincipalPropiedad(
+                    property = property,
+                    modifier = Modifier.fillMaxSize(),
+                    contentDescription = property.title
                 )
                 
                 IconButton(

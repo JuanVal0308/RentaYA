@@ -20,7 +20,9 @@ private val tecnologiasUsadas = listOf(
     "Navigation Compose" to "Navegación entre pantallas",
     "DataStore" to "Sesión y preferencias guardadas en el dispositivo",
     "Supabase" to "Autenticación y base de datos en la nube",
-    "OkHttp" to "Conexión HTTP con Supabase"
+    "OkHttp" to "Conexión HTTP con Supabase (Auth, REST y Storage)",
+    "Coil" to "Fotos de inmuebles (assets y Storage)",
+    "osmdroid" to "Mapa OpenStreetMap de Medellín"
 )
 
 @OptIn(ExperimentalMaterial3Api::class)

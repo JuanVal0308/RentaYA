@@ -14,8 +14,8 @@ android {
         applicationId = "com.rentaya.rentola"
         minSdk = 24
         targetSdk = 36
-        versionCode = 5
-        versionName = "1.0.2"
+        versionCode = 6
+        versionName = "1.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -44,6 +44,8 @@ android {
         val supabaseAnonKey = propSupabase("SUPABASE_ANON_KEY")
         buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
         buildConfigField("String", "SUPABASE_ANON_KEY", "\"$supabaseAnonKey\"")
+        // Nunca true en release. En debug solo si local.properties lo pide.
+        buildConfigField("boolean", "DEBUG_OMITIR_VERIFICACION_CORREO", "false")
     }
 
     val keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -64,12 +66,26 @@ android {
     }
 
     buildTypes {
+        debug {
+            val omitirVerificacion = rootProject.file("local.properties").let { archivo ->
+                if (!archivo.exists()) return@let false
+                val props = Properties()
+                archivo.inputStream().use { props.load(it) }
+                props.getProperty("DEBUG_OMITIR_VERIFICACION_CORREO") == "true"
+            }
+            buildConfigField(
+                "boolean",
+                "DEBUG_OMITIR_VERIFICACION_CORREO",
+                omitirVerificacion.toString()
+            )
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("boolean", "DEBUG_OMITIR_VERIFICACION_CORREO", "false")
             if (hasKeystore) {
                 signingConfig = signingConfigs.getByName("release")
             }
@@ -121,8 +137,14 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
 
-    // HTTP para Supabase REST + Auth (sin SDK pesado)
+    // HTTP para Supabase REST + Auth + Storage (sin SDK pesado)
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
+    // Fotos (assets, Uri de galería y URLs de Storage)
+    implementation("io.coil-kt:coil-compose:2.7.0")
+
+    // Mapa OSM (sin clave de facturación de Google)
+    implementation("org.osmdroid:osmdroid-android:6.1.20")
     
     // Testing
     testImplementation("junit:junit:4.13.2")
