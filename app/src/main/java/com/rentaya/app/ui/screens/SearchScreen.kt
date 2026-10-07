@@ -31,20 +31,26 @@ fun SearchScreen(
     var searchQuery by remember { mutableStateOf("") }
     var selectedType by remember { mutableStateOf<PropertyType?>(null) }
     var showFilters by remember { mutableStateOf(false) }
-    // TODO(equipo - Steve): Añadir filtro por precio máximo (chip o etiqueta del slider)
+    var precioMaximo by remember { mutableStateOf(5_000_000) }
     var propiedades by remember { mutableStateOf(RepositorioPropiedades.listarLocal()) }
+    val currency = remember {
+        NumberFormat.getCurrencyInstance(Locale("es", "CO")).apply {
+            maximumFractionDigits = 0
+        }
+    }
 
     LaunchedEffect(Unit) {
         propiedades = RepositorioPropiedades.listar()
     }
 
-    val filteredProperties = remember(searchQuery, selectedType, propiedades) {
+    val filteredProperties = remember(searchQuery, selectedType, precioMaximo, propiedades) {
         propiedades.filter { property ->
-            val matchesSearch = searchQuery.isBlank() || 
+            val matchesSearch = searchQuery.isBlank() ||
                 property.neighborhood.contains(searchQuery, ignoreCase = true) ||
                 property.title.contains(searchQuery, ignoreCase = true)
             val matchesType = selectedType == null || property.type == selectedType
-            matchesSearch && matchesType
+            val matchesPrice = property.price <= precioMaximo
+            matchesSearch && matchesType && matchesPrice
         }
     }
 
@@ -95,10 +101,27 @@ fun SearchScreen(
             items(PropertyType.values().toList()) { type ->
                 FilterChip(
                     selected = selectedType == type,
-                    onClick = { 
+                    onClick = {
                         selectedType = if (selectedType == type) null else type
                     },
                     label = { Text(type.displayName) }
+                )
+            }
+            item {
+                FilterChip(
+                    selected = precioMaximo < 5_000_000,
+                    onClick = { showFilters = true },
+                    label = {
+                        Text(
+                            if (precioMaximo < 5_000_000)
+                                "Hasta ${currency.format(precioMaximo)}"
+                            else
+                                "Precio máx."
+                        )
+                    },
+                    leadingIcon = {
+                        Icon(Icons.Default.AttachMoney, contentDescription = null, modifier = Modifier.size(18.dp))
+                    }
                 )
             }
         }
@@ -171,8 +194,10 @@ fun SearchScreen(
 
     if (showFilters) {
         FiltersBottomSheet(
+            precioMaximoInicial = precioMaximo,
             onDismiss = { showFilters = false },
-            onApply = { 
+            onApply = { nuevoMaximo ->
+                precioMaximo = nuevoMaximo
                 showFilters = false
                 onFilterResults()
             }
@@ -258,13 +283,17 @@ fun PropertyCard(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FiltersBottomSheet(
+    precioMaximoInicial: Int = 5_000_000,
     onDismiss: () -> Unit,
-    onApply: () -> Unit
+    onApply: (Int) -> Unit
 ) {
-    var priceRange by remember { mutableStateOf(0f..5000000f) }
+    var priceRange by remember {
+        mutableStateOf(0f..precioMaximoInicial.toFloat().coerceIn(0f, 5_000_000f))
+    }
     var selectedBedrooms by remember { mutableStateOf<Int?>(null) }
     var hasParking by remember { mutableStateOf(false) }
     var isFurnished by remember { mutableStateOf(false) }
+    val precioMaximoActual = priceRange.endInclusive.toInt()
     
     ModalBottomSheet(
         onDismissRequest = onDismiss
@@ -279,7 +308,10 @@ fun FiltersBottomSheet(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                TextButton(onClick = onDismiss) {
+                TextButton(onClick = {
+                    priceRange = 0f..5_000_000f
+                    onApply(5_000_000)
+                }) {
                     Text("Limpiar")
                 }
                 Text("Filtros", style = MaterialTheme.typography.titleLarge)
@@ -305,6 +337,16 @@ fun FiltersBottomSheet(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text("Precio", style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.height(8.dp))
+            AssistChip(
+                onClick = { },
+                label = {
+                    Text("Precio máximo: ${formatPrice(precioMaximoActual)}")
+                },
+                leadingIcon = {
+                    Icon(Icons.Default.AttachMoney, contentDescription = null, modifier = Modifier.size(18.dp))
+                }
+            )
             Text(
                 "${formatPrice(priceRange.start.toInt())} - ${formatPrice(priceRange.endInclusive.toInt())}",
                 style = MaterialTheme.typography.bodySmall,
@@ -352,7 +394,7 @@ fun FiltersBottomSheet(
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                onClick = onApply,
+                onClick = { onApply(precioMaximoActual) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)

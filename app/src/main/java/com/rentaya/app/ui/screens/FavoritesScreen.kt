@@ -25,8 +25,15 @@ fun FavoritesScreen(
         modifier = Modifier.fillMaxSize()
     ) {
         TopAppBar(
-            // TODO(equipo - Steve): Mostrar contador "X favoritos" cuando la lista no esté vacía
-            title = { Text("Favoritos") }
+            title = {
+                Text(
+                    if (favoriteProperties.isEmpty()) {
+                        "Favoritos"
+                    } else {
+                        "${favoriteProperties.size} favoritos"
+                    }
+                )
+            }
         )
 
         if (favoriteProperties.isEmpty()) {

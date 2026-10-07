@@ -69,7 +69,6 @@ fun RegisterScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // TODO(equipo - Steve): Validar formato de correo (mensaje de error en español)
         OutlinedTextField(
             value = email,
             onValueChange = { 
@@ -86,7 +85,6 @@ fun RegisterScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // TODO(equipo - Steve): Validar teléfono colombiano (10 dígitos)
         OutlinedTextField(
             value = phone,
             onValueChange = { 
@@ -156,9 +154,18 @@ fun RegisterScreen(
 
         Button(
             onClick = {
+                val correoLimpio = email.trim()
+                val telefonoDigitos = phone.filter { it.isDigit() }
+                val formatoCorreo = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
                 when {
                     name.isBlank() || email.isBlank() || phone.isBlank() || password.isBlank() -> {
                         errorMessage = "Por favor completa todos los campos"
+                    }
+                    !formatoCorreo.matches(correoLimpio) -> {
+                        errorMessage = "Ingresa un correo válido (ejemplo@dominio.com)"
+                    }
+                    telefonoDigitos.length != 10 -> {
+                        errorMessage = "El teléfono debe tener 10 dígitos (Colombia)"
                     }
                     !acceptTerms -> {
                         errorMessage = "Debes aceptar los términos y condiciones"
@@ -169,8 +176,8 @@ fun RegisterScreen(
                         scope.launch {
                             val resultado = RepositorioUsuarios.registrar(
                                 nombre = name.trim(),
-                                correo = email.trim(),
-                                telefono = phone.trim(),
+                                correo = correoLimpio,
+                                telefono = telefonoDigitos,
                                 clave = password
                             )
                             cargando = false
