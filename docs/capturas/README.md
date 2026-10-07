@@ -1,6 +1,12 @@
-# Capturas de pantalla
+# Capturas de pantalla — RentaYa
 
-TODO(equipo - Steve / Mariana): colocar aquí capturas del emulador o dispositivo
-(Login, Búsqueda, Detalle, Perfil, etc.) en PNG y enlazarlas en el README raíz.
+Imágenes 1080×1920 (teléfono) para README y Google Play:
 
-Resolución recomendada para Play Store: al menos 1080px en el lado largo.
+| Archivo | Pantalla |
+|---------|----------|
+| `login.png` | Inicio de sesión |
+| `busqueda.png` | Búsqueda con filtros y mapa |
+| `detalle.png` | Detalle de propiedad |
+| `publicar.png` | Formulario publicar inmueble |
+
+También están en `/workspace/rentaya-shots/play/screens/` para la consola de Play.

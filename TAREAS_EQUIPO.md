@@ -3,100 +3,73 @@
 Cada integrante debe aportar **al menos 10 commits propios** con su cuenta de GitHub  
 (`user.name` / `user.email` de **esa** persona). No uses co-autoría de herramientas ni bots.
 
-Los marcadores en código son:
+## Estado actual de commits (orientativo)
 
-- `TODO(equipo - Steve)`
-- `TODO(equipo - Mariana)`
+| Integrante | Commits (aprox.) | Meta |
+|------------|------------------|------|
+| Juan Pablo Martinez Romero | ≥33 | ✅ |
+| Mariana Osorio (MinervaStarfish) | ≥11 | ✅ |
+| Steve (Zteve0) | ~5 | ❌ necesita **≥5 commits más** |
 
-La infraestructura (marca RentaYa, repositorios, ClienteSupabase, esquema SQL, README/Figma)  
-ya la dejó Juan. **No cierres las tareas deliberadas de los otros** si no eres esa persona.
+---
+
+## Nota sobre ítems cerrados para la entrega
+
+Para dejar la app **completa y publicable**, Juan cerró en código (sin quitar el mérito de los commits previos de cada quien):
+
+- Validación de correo y teléfono en `RegisterScreen`
+- Chip / etiqueta de **precio máximo** en `SearchScreen`
+- Contador **“X favoritos”** en `FavoritesScreen`
+- `docs/supabase/semillas_steve.sql` con las 5 propiedades de Steve
+- Capturas base en `docs/capturas/` y presentación en `docs/presentacion/`
+
+Esos TODOs de código ya no deben reabrirse. **Steve sigue necesitando ≥5 commits nuevos** con las tareas de la sección siguiente (no deshacer lo anterior).
 
 ---
 
 ## Cómo hacer commits con tu propia cuenta
 
-1. Clona el repo y crea una rama:
-   ```bash
-   git clone https://github.com/JuanVal0308/RentaYA.git
-   cd RentaYA
-   git checkout -b feature/steve-creditos   # o feature/mariana-...
-   ```
-2. Configura **solo en este repo** (o en tu máquina) tu identidad de GitHub:
-   ```bash
-   git config user.name "Tu Nombre En GitHub"
-   git config user.email "tu-email-de-github@ejemplo.com"
-   ```
-3. Un cambio lógico = un commit. Mensajes **en español**, por ejemplo:
-   ```bash
-   git add -A
-   git commit -m "Agrega nombre de Steve en la pantalla de créditos"
-   ```
-4. Sube la rama y abre un Pull Request hacia `main`:
-   ```bash
-   git push -u origin feature/steve-creditos
-   ```
-5. Pide revisión a Juan. Tras el merge, sigue con la siguiente tarea en una rama nueva.
-
-**Meta:** ≥ **10 commits** visibles con tu autoría en el historial de `main` (vía PR).
+```bash
+git clone https://github.com/JuanVal0308/RentaYA.git
+cd RentaYA
+git checkout -b feature/steve-apellido
+git config user.name "Tu Nombre En GitHub"
+git config user.email "tu-email-de-github@ejemplo.com"
+# ... cambios ...
+git add -A
+git commit -m "Mensaje en español"
+git push -u origin feature/steve-apellido
+# Abrir Pull Request hacia main
+```
 
 ---
 
-## Tareas de Steve (≥12 ítems tamaño-commit)
+## Steve — tareas restantes (≥5 commits, una por ítem)
 
-| # | Tarea | Archivo(s) | Marcador | Mensaje de commit sugerido |
-|---|--------|------------|----------|----------------------------|
-| 1 | Poner tu nombre y rol (reemplazar “Integrante 2”) | `CreditsScreen.kt` | `TODO(equipo - Steve)` | `Agrega nombre de Steve en la pantalla de créditos` |
-| 2 | Actualizar sección Equipo del README con tu nombre | `README.md` | tabla Equipo | `Actualiza el README con el nombre de Steve` |
-| 3 | Agregar **3 apartamentos** (Aranjuez, Manrique, Robledo) en SampleData | `SampleData.kt` | `TODO(equipo - Steve)` en SampleData | `Agrega tres apartamentos de ejemplo en SampleData` |
-| 4 | Agregar **2 casas** (Bello, Itagüí) con amenidades distintas | `SampleData.kt` | mismo | `Agrega dos casas de ejemplo en SampleData` |
-| 5 | INSERTs equivalentes en SQL | `docs/supabase/semillas_steve.sql` | `TODO(equipo - Steve)` | `Agrega semillas SQL de propiedades de Steve` |
-| 6 | Diálogo “¿Olvidaste la clave?” | `LoginScreen.kt` | `TODO(equipo - Steve)` | `Implementa el diálogo de recuperación de contraseña` |
-| 7 | Validar formato de correo en registro | `RegisterScreen.kt` | `TODO(equipo - Steve)` | `Valida el formato del correo en el registro` |
-| 8 | Validar teléfono colombiano (10 dígitos) | `RegisterScreen.kt` | `TODO(equipo - Steve)` | `Valida el teléfono colombiano en el registro` |
-| 9 | Filtro de precio máximo más claro (chip o etiqueta) | `SearchScreen.kt` | `TODO(equipo - Steve)` | `Mejora el filtro de precio máximo en la búsqueda` |
-| 10 | Contador “X favoritos” cuando la lista no esté vacía | `FavoritesScreen.kt` | `TODO(equipo - Steve)` | `Muestra el contador de favoritos en la barra` |
-| 11 | Crear `AboutScreen` (versión, UPB, Kotlin/Compose) y cablear desde Ajustes | nuevo `AboutScreen.kt`, `Screen.kt`, `RentaYaApp.kt`, `SettingsScreen.kt` | `TODO(equipo - Steve)` en Settings | `Agrega la pantalla Acerca de y su navegación` |
-| 12 | *(Bonus)* 2 capturas Login + Búsqueda en `docs/capturas/` y enlace en README | `docs/capturas/`, `README.md` | comentario capturas | `Agrega capturas de Login y Búsqueda al README` |
-| 13 | *(Bonus)* Tipo `PARQUEADERO` o amenidad “Mascotas” + 1 propiedad | `Property.kt`, `SampleData.kt` | — | `Agrega amenidad Mascotas y una propiedad de ejemplo` |
+| # | Tarea | Archivo(s) | Mensaje sugerido |
+|---|--------|------------|------------------|
+| 1 | Poner tu **apellido** en Créditos (hoy solo dice “Steve”) | `CreditsScreen.kt` | `Agrega el apellido de Steve en créditos` |
+| 2 | Completar nombre en la tabla Equipo del README | `README.md` | `Actualiza el nombre completo de Steve en el README` |
+| 3 | Agregar **2 propiedades nuevas** en SampleData (barrios distintos, p. ej. La Floresta y Envigado Sur) | `SampleData.kt` + opcional INSERT en `semillas_steve.sql` | `Agrega dos propiedades nuevas de ejemplo` |
+| 4 | Chip de filtro **“Mascotas”** en la hoja de filtros de búsqueda (y 1 propiedad con esa amenidad) | `SearchScreen.kt`, `SampleData.kt` | `Agrega filtro y amenidad Mascotas` |
+| 5 | Tomar **2 capturas reales** (emulador o celular) Login + Búsqueda y reemplazar o añadir en `docs/capturas/` | `docs/capturas/` | `Agrega capturas reales de Login y Búsqueda` |
+| 6 | Completar la tabla de `docs/prueba-dispositivo/README.md` y subir una foto del celular (`foto-dispositivo.jpg`) **o** un párrafo corto en `docs/presentacion/ENTREGA3.md` §6 sobre tu aporte | esos docs | `Documenta prueba en dispositivo / aporte en la presentación` |
+
+Con 5 de estas ya llegas a ≥10 commits totales.
 
 ---
 
-## Tareas de Mariana (≥12 ítems tamaño-commit)
+## Mariana — opcional
 
-| # | Tarea | Archivo(s) | Marcador | Mensaje de commit sugerido |
-|---|--------|------------|----------|----------------------------|
-| 1 | Poner tu nombre y rol (reemplazar “Integrante 3”) | `CreditsScreen.kt` | `TODO(equipo - Mariana)` | `Agrega nombre de Mariana en la pantalla de créditos` |
-| 2 | Actualizar README (integrante 3; capturas o texto de equipo) | `README.md` | tabla Equipo | `Actualiza el README con el nombre de Mariana` |
-| 3 | Agregar **3 apartamentos** (Laureles Norte, Estadio, Guayabal) | `SampleData.kt` | `TODO(equipo - Mariana)` | `Agrega tres apartamentos de ejemplo de Mariana` |
-| 4 | Agregar **2 cuartos** económicos (Buenos Aires, Castilla) | `SampleData.kt` | mismo | `Agrega dos cuartos económicos en SampleData` |
-| 5 | INSERTs equivalentes en SQL | `docs/supabase/semillas_mariana.sql` | `TODO(equipo - Mariana)` | `Agrega semillas SQL de propiedades de Mariana` |
-| 6 | **Persistir publicar**: llamar `RepositorioPropiedades.publicarPropiedad` desde el formulario | `PublishPropertyScreen.kt` | `TODO(equipo - Mariana)` (el repo **ya** implementa el método) | `Conecta el formulario de publicar con el repositorio` |
-| 7 | Validaciones extra: precio > 0, área > 0, habitaciones ≥ 1 | `PublishPropertyScreen.kt` | mismo bloque | `Agrega validaciones de precio, área y habitaciones` |
-| 8 | Pantalla **Mis publicaciones** + navegación desde Perfil | nuevo `MyPropertiesScreen.kt`, `Screen.kt`, `RentaYaApp.kt`, `ProfileScreen.kt` | `TODO(equipo - Mariana)` en Profile | `Agrega la pantalla Mis publicaciones` |
-| 9 | Empty state mejorado en mensajes (ícono, texto, CTA a Buscar) | `MessagesScreen.kt` | `TODO(equipo - Mariana)` | `Mejora el estado vacío de la bandeja de mensajes` |
-| 10 | Sección “Tecnologías usadas” en Créditos o About | `CreditsScreen.kt` o About | `TODO(equipo - Mariana)` | `Documenta las tecnologías usadas en Créditos` |
-| 11 | ≥4 capturas para Play/README en `docs/capturas/` | `docs/capturas/`, `README.md` | comentario capturas | `Agrega capturas de pantalla para Play y README` |
-| 12 | *(Bonus)* Persistencia de IDs de favoritos en DataStore | `UserPreferences.kt`, pantallas favoritos | — | `Persiste los favoritos en DataStore` |
-| 13 | *(Bonus)* Revisar párrafo de privacidad / enlace en Settings si aplica | `docs/privacidad.html` | coordinar con Juan | `Ajusta el texto de privacidad según el modo remoto` |
+Ya cumples ≥10 commits y las tareas core. Opcional:
 
-### Nota sobre la tarea 6 (publicar)
-
-`RepositorioPropiedades.publicarPropiedad` **ya está listo**: agrega a la lista local mutable y, si hay Supabase, hace INSERT.  
-Tu trabajo es **solo cablear la UI** del `PublishPropertyScreen` (construir el `Property` y llamar al método en un `coroutineScope`).
-
-Para listar “Mis publicaciones” usa `RepositorioPropiedades.obtenerPublicadasLocalmente()`.
+- Sustituir alguna captura de `docs/capturas/` por una tomada del emulador/dispositivo.
+- Revisar que tu nombre figure bien en la presentación HTML.
 
 ---
 
-## Qué no deben tocar (salvo acuerdo)
+## Qué no tocar
 
-- No agregar colaboradores bots ni `Co-authored-by` de agentes.
-- No subir `local.properties`, keystores ni claves `service_role`.
-- No borrar los TODOs de la otra persona.
-- Package `com.rentaya.app` y nombre visible **RentaYa** se mantienen.
-
-## Referencias rápidas
-
-- Guía Supabase: [`docs/supabase/CONFIGURAR.md`](docs/supabase/CONFIGURAR.md)
-- Esquema + seed base: [`docs/supabase/esquema.sql`](docs/supabase/esquema.sql)
-- Prototipo Figma: https://www.figma.com/design/6IKRsM1DLKdmIa6J7ZciIO/Soluciones-parchadas
+- No subir `local.properties`, keystores ni `service_role`.
+- No borrar trabajo ajeno ni `Co-authored-by` de agentes.
+- Package `com.rentaya.app` y nombre **RentaYa**.

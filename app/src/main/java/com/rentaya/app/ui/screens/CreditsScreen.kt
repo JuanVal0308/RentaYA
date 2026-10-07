@@ -110,7 +110,7 @@ fun CreditsScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Versión 1.0.0",
+                text = "Versión 1.0.2",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

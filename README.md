@@ -4,19 +4,19 @@
 
 > **Proyecto Académico** - Entrega 3: Aplicación Móvil Nativa  
 > Universidad Pontificia Bolivariana (UPB) - Curso de Aplicaciones Móviles  
-> Versión: 1.0.0 · `applicationId`: `com.rentaya.app`
+> Versión: **1.0.2** · `applicationId`: `com.rentaya.app`
 
 ## 📱 Características
 
-- ✅ **Autenticación**: Login y registro locales; con Supabase Auth si hay claves en `local.properties`
-- 🔍 **Búsqueda y filtros**: Barrio, tipo de propiedad, precio, habitaciones
+- ✅ **Autenticación**: Login y registro locales; Supabase Auth con las claves de `supabase.properties`
+- 🔍 **Búsqueda y filtros**: Barrio, tipo, chip de **precio máximo**, habitaciones
 - 🗺️ **Vista de mapa**: Mock estático de Medellín
-- ❤️ **Favoritos**: Guarda propiedades preferidas (en memoria)
+- ❤️ **Favoritos**: IDs persistidos en **DataStore** + contador en la barra
 - 💬 **Chat**: Conversación mock con arrendadores
-- 📝 **Publicar inmueble**: Formulario listo; persistencia vía `RepositorioPropiedades` (enganche UI pendiente del equipo)
-- ⚙️ **Configuración**: Tema claro/oscuro, notificaciones
-- 👥 **Créditos**: Información del equipo de desarrollo
-- 📴 **Offline por defecto**: Sin claves Supabase usa `SampleData` (20 propiedades). Con claves, intenta remoto y cae a local si hay error de red.
+- 📝 **Publicar inmueble**: Formulario que **persiste** vía `RepositorioPropiedades` (local + remoto)
+- 🏠 **Mis publicaciones**: Lista de lo publicado en la sesión
+- ⚙️ **Configuración / Acerca de / Créditos**
+- 📴 **Offline por defecto**: Sin red o sin claves usa `SampleData` (**~30 propiedades**). Con Supabase, intenta remoto y cae a local si falla la red.
 
 ## 🏗️ Arquitectura
 
@@ -26,8 +26,8 @@ app/
 │   ├── model/                 # Property, User, Message, Landlord
 │   ├── repositorio/           # RepositorioPropiedades, RepositorioUsuarios
 │   ├── remoto/                # ClienteSupabase (REST + Auth HTTP)
-│   ├── SampleData.kt          # Semillas locales + usuarios/favoritos en memoria
-│   └── UserPreferences.kt     # DataStore (sesión y preferencias)
+│   ├── SampleData.kt          # Semillas locales (~30) + favoritos en memoria
+│   └── UserPreferences.kt     # DataStore (sesión, tema, IDs favoritos)
 ├── ui/
 │   ├── theme/                 # Material 3 (Cream + Green)
 │   ├── screens/               # Pantallas Compose
@@ -39,121 +39,89 @@ app/
 
 | Capa | Responsabilidad |
 |------|-----------------|
-| **UI (Compose)** | Pantallas, navegación, estado de formularios |
-| **Preferencias** | `UserPreferences` (DataStore): sesión, tema, notificaciones |
-| **Repositorios** | `RepositorioUsuarios` / `RepositorioPropiedades`: eligen remoto o local |
-| **Remoto** | `ClienteSupabase` (OkHttp) contra Auth y REST de Supabase |
-| **Local** | `SampleData` + lista mutable de publicaciones de la sesión |
+| **UI (Compose)** | Pantallas, navegación, formularios |
+| **Preferencias** | `UserPreferences` (DataStore) |
+| **Repositorios** | Eligen remoto o local |
+| **Remoto** | `ClienteSupabase` (OkHttp) |
+| **Local** | `SampleData` + publicaciones de la sesión |
 
-Las claves `SUPABASE_URL` y `SUPABASE_ANON_KEY` se leen de `local.properties` y se inyectan en `BuildConfig`. Si están vacías, **no** se llama a la red.
+Las claves se leen de `supabase.properties` (y opcional override en `local.properties`) → `BuildConfig`.
 
 ### Navegación
 
 - **Auth**: Onboarding → Login / Register  
-- **Principal** (bottom nav): Buscar, Favoritos, Chat, Perfil  
-- **Detalle**: Buscar/Favoritos → Detalle → Chat  
-- **Menú Perfil**: Publicar inmueble, Mis publicaciones (pendiente), Configuración, Créditos  
+- **Principal**: Buscar, Favoritos, Chat, Perfil  
+- **Menú Perfil**: Publicar, **Mis publicaciones**, Configuración, Créditos  
 
 ## 🚀 Cómo ejecutar
 
-### Cómo correr en Android Studio (equipo)
+1. Clona y abre la carpeta en **Android Studio** (JDK 17 o 21).  
+2. Sync Gradle — `supabase.properties` ya trae URL y clave anon.  
+3. Emulador o celular con depuración USB → Run 'app'.  
 
-1. Clona y abre la carpeta raíz en **Android Studio** (File → Open).
-2. **JDK 17 o 21** en Gradle JDK (recomendado: Eclipse Adoptium 21).
-3. Deja que sincronice Gradle. El archivo **`supabase.properties`** en la raíz ya trae `SUPABASE_URL` y la clave **anon** pública; la app conecta a Supabase al primer Run.
-4. Emulador (API 24+) o celular con **depuración USB** → Run 'app'.
-5. Opcional: `local.properties` solo necesita `sdk.dir` (Android Studio lo crea). Puedes sobreescribir ahí las claves Supabase si quieres.
-
-Guía completa de backend: [`docs/supabase/CONFIGURAR.md`](docs/supabase/CONFIGURAR.md).
-
-### Requisitos
-
-- Android Studio Hedgehog (2023.1.1) o superior  
-- JDK 17+ (21 OK)  
-- Android SDK 35  
-- Gradle 8.11.1 (wrapper)  
-
-### Terminal
+Detalle: [`docs/supabase/CONFIGURAR.md`](docs/supabase/CONFIGURAR.md).
 
 ```bash
-git clone https://github.com/JuanVal0308/RentaYA.git
-cd RentaYA
-./gradlew assembleDebug          # Linux/macOS
-# gradlew.bat assembleDebug      # Windows
-# APK: app/build/outputs/apk/debug/app-debug.apk
-```
-
-### Firma de release
-
-Crear `keystore.properties` en la raíz (está en `.gitignore`). Luego:
-
-```bash
-./gradlew bundleRelease
+./gradlew assembleDebug
+./gradlew bundleRelease   # requiere keystore.properties local
 ```
 
 ## 🎨 Diseño
 
-### Wireframes
-
 - **Manuales**: [`docs/wireframes/manuales/wireframes-manuales-rentaya.pdf`](docs/wireframes/manuales/wireframes-manuales-rentaya.pdf)
-- **Digitales (Figma / prototipo RentaYa)**: [Soluciones parchadas](https://www.figma.com/design/6IKRsM1DLKdmIa6J7ZciIO/Soluciones-parchadas)
+- **Figma**: [Soluciones parchadas](https://www.figma.com/design/6IKRsM1DLKdmIa6J7ZciIO/Soluciones-parchadas)
+- Paleta: Cream `#F7F3EC` · Green `#0E6B56` · Dark Green `#0A4D3E`
 
-### Paleta
+### Capturas
 
-- Cream `#F7F3EC` · Green `#0E6B56` · Dark Green `#0A4D3E`
-
-### Capturas de pantalla
-
-<!-- TODO(equipo - Mariana / Steve): Agregar capturas en docs/capturas/ y descomentar
 <p align="center">
-  <img src="docs/capturas/onboarding.png" width="200" />
-  <img src="docs/capturas/search.png" width="200" />
-  <img src="docs/capturas/detail.png" width="200" />
-  <img src="docs/capturas/profile.png" width="200" />
+  <img src="docs/capturas/login.png" width="180" alt="Login" />
+  <img src="docs/capturas/busqueda.png" width="180" alt="Búsqueda" />
+  <img src="docs/capturas/detalle.png" width="180" alt="Detalle" />
+  <img src="docs/capturas/publicar.png" width="180" alt="Publicar" />
 </p>
--->
 
 ## 🗂️ Datos de ejemplo
 
-**20 propiedades** de Medellín y alrededores (El Poblado, Laureles, Envigado, etc.), tipos Apto / Casa / Cuarto, precios aprox. $550.000 – $2.500.000 COP/mes.  
-Semilla SQL equivalente en [`docs/supabase/esquema.sql`](docs/supabase/esquema.sql).
+**~30 propiedades** (semilla base + aportes de Steve y Mariana): El Poblado, Laureles, Aranjuez, Manrique, Robledo, Bello, Itagüí, etc.  
+SQL: [`docs/supabase/esquema.sql`](docs/supabase/esquema.sql), [`semillas_steve.sql`](docs/supabase/semillas_steve.sql), [`semillas_mariana.sql`](docs/supabase/semillas_mariana.sql).
 
 ## 🔐 Privacidad
 
-- Sin Supabase: datos solo en el dispositivo (DataStore + memoria).  
-- Con Supabase: cuenta y propiedades pueden almacenarse en el proyecto remoto (ver política).  
+- Local: DataStore + memoria.  
+- Con Supabase: cuenta y propiedades en el proyecto remoto.  
 
-- Política: [`docs/privacidad.html`](docs/privacidad.html)  
-- GitHub Pages (si se publica): https://juanval0308.github.io/RentaYA/privacidad.html  
+- Archivo: [`docs/privacidad.html`](docs/privacidad.html)  
+- **URL pública:** https://juanval0308.github.io/RentaYA/privacidad.html  
 
 ## 👥 Equipo
 
 | Integrante | Rol | Notas |
 |------------|-----|-------|
-| **Juan Pablo Martinez Romero** | Desarrollador principal | Infraestructura, repositorios, marca, docs |
-| **Steve** | [TODO - nombre completo] | Ver [`TAREAS_EQUIPO.md`](TAREAS_EQUIPO.md) (≥10 commits) |
-| **Mariana Osorio** | Ingeniera | Ver [`TAREAS_EQUIPO.md`](TAREAS_EQUIPO.md) (≥10 commits) |
+| **Juan Pablo Martinez Romero** | Desarrollador principal | Infra, Supabase, Play, docs |
+| **Steve** (Zteve0) | Desarrollador | Completo en funcionalidad base; ver commits restantes en `TAREAS_EQUIPO.md` |
+| **Mariana Osorio** | Ingeniera | Publicar, Mis publicaciones, favoritos DataStore — **completo** |
 
 ## 📦 Publicación en Google Play
 
-<!-- Placeholder para cuando exista el enlace del listing -->
-
-- **Cuenta Play Console**: `juanpa.martinezro@gmail.com`  
-- **Estado**: pendiente de generar `.aab` firmado, capturas 1080p+ y publicar en pista interna/producción.  
-- **Enlace de la ficha**: _[TODO - Agregar URL de Play Store]_  
-- Package: `com.rentaya.app` · Nombre visible: **RentaYa**
+- **Cuenta:** `juanpa.martinezro@gmail.com`  
+- **Estado:** AAB **1.0.2** (versionCode 3) listo para **prueba interna**; enlace de ficha pendiente de pegar tras liberar en Console.  
+- **Enlace:** _[completar URL de Play / Internal testing]_  
+- Package: `com.rentaya.app` · Nombre: **RentaYa**
 
 ## 📱 Prueba en dispositivo físico
 
-<!-- Placeholder de evidencia -->
+Checklist y plantilla: [`docs/prueba-dispositivo/README.md`](docs/prueba-dispositivo/README.md)  
+(Pendiente: foto del celular del equipo.)
 
-- **Estado**: pendiente documentar.  
-- **Qué registrar**: modelo del celular, versión de Android, fecha, y foto/video corto instalando el APK/AAB de depuración o release.  
-- **Dónde dejar evidencia**: `docs/prueba-dispositivo/` (crear carpeta) y un párrafo aquí con el resumen.
+## 📑 Presentación
+
+- Guion: [`docs/presentacion/ENTREGA3.md`](docs/presentacion/ENTREGA3.md)  
+- One-pager: [`docs/presentacion/index.html`](docs/presentacion/index.html)
 
 ## 📝 Tareas del equipo
 
-Ver [`TAREAS_EQUIPO.md`](TAREAS_EQUIPO.md): listas por integrante, marcadores `TODO(equipo - Steve)` / `TODO(equipo - Mariana)`, guía de commits con cuenta propia y PRs a `main`.
+Ver [`TAREAS_EQUIPO.md`](TAREAS_EQUIPO.md).
 
 ## 📄 Licencia
 
@@ -161,8 +129,7 @@ MIT — fines educativos (UPB 2026).
 
 ## 📞 Contacto
 
-- Repositorio: https://github.com/JuanVal0308/RentaYA  
-- Issues: https://github.com/JuanVal0308/RentaYA/issues  
+- https://github.com/JuanVal0308/RentaYA  
 
 ---
 
