@@ -1,7 +1,6 @@
 package com.rentaya.app.ui.screens
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -14,6 +13,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.rentaya.app.data.UserPreferences
+import com.rentaya.app.data.model.CorreoNoConfirmadoException
 import com.rentaya.app.data.repositorio.RepositorioUsuarios
 import kotlinx.coroutines.launch
 
@@ -21,6 +21,7 @@ import kotlinx.coroutines.launch
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
     onRegister: () -> Unit,
+    onNeedsVerification: (String) -> Unit,
     userPreferences: UserPreferences
 ) {
     var email by remember { mutableStateOf("") }
@@ -125,12 +126,21 @@ fun LoginScreen(
                         cargando = false
                         resultado.fold(
                             onSuccess = { user ->
-                                userPreferences.login(user.email, user.name, user.phone)
+                                userPreferences.login(
+                                    user.email,
+                                    user.name,
+                                    user.phone,
+                                    user.emailConfirmed
+                                )
                                 onLoginSuccess()
                             },
                             onFailure = { error ->
-                                errorMessage = error.message
-                                    ?: "Correo o contraseña incorrectos"
+                                if (error is CorreoNoConfirmadoException) {
+                                    onNeedsVerification(error.correo)
+                                } else {
+                                    errorMessage = error.message
+                                        ?: "Correo o contraseña incorrectos"
+                                }
                             }
                         )
                     }
@@ -155,33 +165,10 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "o continuar con...",
+            text = "Ingresa con el correo que registraste. Si aún no confirmas la cuenta, te pediremos revisar el mensaje de verificación.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            repeat(3) {
-                Surface(
-                    modifier = Modifier.size(48.dp),
-                    shape = CircleShape,
-                    color = MaterialTheme.colorScheme.surfaceVariant
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            Icons.Default.Circle,
-                            contentDescription = null,
-                            modifier = Modifier.size(24.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            }
-        }
 
         Spacer(modifier = Modifier.height(24.dp))
 

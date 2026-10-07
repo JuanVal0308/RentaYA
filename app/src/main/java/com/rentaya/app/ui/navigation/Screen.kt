@@ -20,4 +20,10 @@ sealed class Screen(val route: String) {
     object Credits : Screen("credits")
     object PublishProperty : Screen("publish_property")
     object MyProperties : Screen("my_properties")
+    object VerifyEmail : Screen("verify_email?correo={correo}") {
+        fun createRoute(correo: String): String {
+            val valor = correo.ifBlank { "_" }
+            return "verify_email?correo=${android.net.Uri.encode(valor)}"
+        }
+    }
 }

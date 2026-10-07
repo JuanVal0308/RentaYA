@@ -1,6 +1,7 @@
 package com.rentaya.app.data.repositorio
 
 import com.rentaya.app.data.SampleData
+import com.rentaya.app.data.model.ResultadoAuth
 import com.rentaya.app.data.model.User
 import com.rentaya.app.data.remoto.ClienteSupabase
 
@@ -15,7 +16,10 @@ object RepositorioUsuarios {
         if (ClienteSupabase.estaConfigurado) {
             val remoto = ClienteSupabase.iniciarSesion(correo, clave)
             if (remoto.isSuccess) return remoto
-            // Si el remoto falla, intenta fallback local (útil en demos).
+            // Fallback local solo si el remoto no es "correo sin confirmar".
+            if (remoto.exceptionOrNull() is com.rentaya.app.data.model.CorreoNoConfirmadoException) {
+                return remoto
+            }
             val local = SampleData.validateLogin(correo, clave)
             if (local != null) return Result.success(local)
             return remoto
@@ -33,16 +37,23 @@ object RepositorioUsuarios {
         correo: String,
         telefono: String,
         clave: String
-    ): Result<User> {
+    ): Result<ResultadoAuth> {
         if (ClienteSupabase.estaConfigurado) {
             return ClienteSupabase.registrar(nombre, correo, telefono, clave)
         }
         if (SampleData.isEmailRegistered(correo)) {
             return Result.failure(Exception("Este correo ya está registrado"))
         }
-        val usuario = User(correo, nombre, telefono, clave)
+        val usuario = User(correo, nombre, telefono, clave, emailConfirmed = true)
         SampleData.registerUser(usuario)
-        return Result.success(usuario)
+        return Result.success(ResultadoAuth(usuario, requiereConfirmacion = false))
+    }
+
+    suspend fun reenviarConfirmacion(correo: String): Result<Unit> {
+        if (!ClienteSupabase.estaConfigurado) {
+            return Result.success(Unit)
+        }
+        return ClienteSupabase.reenviarConfirmacion(correo)
     }
 
     fun correoRegistradoLocal(correo: String): Boolean =

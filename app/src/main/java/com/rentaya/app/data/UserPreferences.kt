@@ -19,6 +19,7 @@ class UserPreferences(private val context: Context) {
         val DARK_MODE = booleanPreferencesKey("dark_mode")
         val NOTIFICATIONS_ENABLED = booleanPreferencesKey("notifications_enabled")
         val FAVORITE_IDS = stringSetPreferencesKey("favorite_ids")
+        val EMAIL_CONFIRMED = booleanPreferencesKey("email_confirmed")
     }
     
     val isLoggedIn: Flow<Boolean> = context.dataStore.data
@@ -51,12 +52,23 @@ class UserPreferences(private val context: Context) {
             preferences[PreferencesKeys.FAVORITE_IDS] ?: emptySet()
         }
 
-    suspend fun login(email: String, name: String, phone: String) {
+    val emailConfirmed: Flow<Boolean> = context.dataStore.data
+        .map { preferences ->
+            preferences[PreferencesKeys.EMAIL_CONFIRMED] ?: true
+        }
+
+    suspend fun login(
+        email: String,
+        name: String,
+        phone: String,
+        emailConfirmed: Boolean = true
+    ) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKeys.IS_LOGGED_IN] = true
             preferences[PreferencesKeys.USER_EMAIL] = email
             preferences[PreferencesKeys.USER_NAME] = name
             preferences[PreferencesKeys.USER_PHONE] = phone
+            preferences[PreferencesKeys.EMAIL_CONFIRMED] = emailConfirmed
         }
     }
     
@@ -66,6 +78,13 @@ class UserPreferences(private val context: Context) {
             preferences[PreferencesKeys.USER_EMAIL] = ""
             preferences[PreferencesKeys.USER_NAME] = ""
             preferences[PreferencesKeys.USER_PHONE] = ""
+            preferences[PreferencesKeys.EMAIL_CONFIRMED] = true
+        }
+    }
+
+    suspend fun setEmailConfirmed(confirmed: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.EMAIL_CONFIRMED] = confirmed
         }
     }
     

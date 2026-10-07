@@ -11,6 +11,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.rentaya.app.data.SampleData
 import com.rentaya.app.data.UserPreferences
 import com.rentaya.app.ui.screens.*
@@ -133,6 +134,9 @@ fun RentaYaApp(
                     onRegister = {
                         navController.navigate(Screen.Register.route)
                     },
+                    onNeedsVerification = { correo ->
+                        navController.navigate(Screen.VerifyEmail.createRoute(correo))
+                    },
                     userPreferences = userPreferences
                 )
             }
@@ -144,8 +148,36 @@ fun RentaYaApp(
                             popUpTo(0) { inclusive = true }
                         }
                     },
+                    onNeedsVerification = { correo ->
+                        navController.navigate(Screen.VerifyEmail.createRoute(correo)) {
+                            popUpTo(Screen.Register.route) { inclusive = true }
+                        }
+                    },
                     onBack = { navController.navigateUp() },
                     userPreferences = userPreferences
+                )
+            }
+
+            composable(
+                route = Screen.VerifyEmail.route,
+                arguments = listOf(navArgument("correo") {
+                    type = NavType.StringType
+                    defaultValue = "_"
+                }),
+                deepLinks = listOf(
+                    navDeepLink { uriPattern = "rentaya://auth-callback" }
+                )
+            ) { backStackEntry ->
+                val crudo = backStackEntry.arguments?.getString("correo").orEmpty()
+                val correo = if (crudo == "_") "" else android.net.Uri.decode(crudo)
+                VerifyEmailScreen(
+                    correo = correo,
+                    onIrALogin = {
+                        navController.navigate(Screen.Login.route) {
+                            popUpTo(Screen.Onboarding.route) { inclusive = false }
+                        }
+                    },
+                    onAtras = { navController.navigateUp() }
                 )
             }
             
@@ -234,6 +266,9 @@ fun RentaYaApp(
                     onMyProperties = {
                         navController.navigate(Screen.MyProperties.route)
                     },
+                    onVerificarCorreo = { correo ->
+                        navController.navigate(Screen.VerifyEmail.createRoute(correo))
+                    },
                     userPreferences = userPreferences
                 )
             }
@@ -266,7 +301,11 @@ fun RentaYaApp(
             composable(Screen.PublishProperty.route) {
                 PublishPropertyScreen(
                     onBack = { navController.navigateUp() },
-                    onSuccess = { navController.navigateUp() }
+                    onSuccess = { navController.navigateUp() },
+                    onVerificarCorreo = {
+                        navController.navigate(Screen.VerifyEmail.createRoute(""))
+                    },
+                    userPreferences = userPreferences
                 )
             }
 

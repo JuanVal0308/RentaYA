@@ -70,6 +70,25 @@ Ya cumples ≥10 commits y las tareas core. Opcional:
 
 ## Qué no tocar
 
-- No subir `local.properties`, keystores ni `service_role`.
-- No borrar trabajo ajeno ni `Co-authored-by` de agentes.
-- Package `com.rentaya.rentola` y nombre **RentaYa**.
+- No agregar colaboradores bots ni `Co-authored-by` de agentes.
+- No subir `local.properties`, keystores ni claves `service_role`.
+- No borrar trabajo ajeno ni reabrir TODOs ya cerrados en código.
+- Package Kotlin `com.rentaya.app` y nombre visible **RentaYa** se mantienen.
+- `applicationId` de Play: `com.rentaya.rentola` (no lo cambies).
+
+## Opcional (demo comercial)
+
+Pulidos libres que no cierran las tareas restantes de Steve:
+
+- Steve: capturas Login + Búsqueda con el mapa real.
+- Mariana: capturas Publicar (fotos + pin) y Detalle (galería).
+- Cualquiera: correr en SQL Editor [`docs/supabase/migracion_fotos_mapa.sql`](docs/supabase/migracion_fotos_mapa.sql).
+
+---
+
+## Referencias rápidas
+
+- Guía Supabase: [`docs/supabase/CONFIGURAR.md`](docs/supabase/CONFIGURAR.md)
+- Esquema + seed base: [`docs/supabase/esquema.sql`](docs/supabase/esquema.sql)
+- Migración fotos/mapa/Storage: [`docs/supabase/migracion_fotos_mapa.sql`](docs/supabase/migracion_fotos_mapa.sql)
+- Prototipo Figma: https://www.figma.com/design/6IKRsM1DLKdmIa6J7ZciIO/Soluciones-parchadas

@@ -4,19 +4,20 @@
 
 > **Proyecto Académico** - Entrega 3: Aplicación Móvil Nativa  
 > Universidad Pontificia Bolivariana (UPB) - Curso de Aplicaciones Móviles  
-> Versión: **1.0.2** · `applicationId`: `com.rentaya.rentola`
+> Versión: **1.1.0** · `applicationId`: `com.rentaya.rentola` · paquete Kotlin: `com.rentaya.app`
 
 ## 📱 Características
 
-- ✅ **Autenticación**: Login y registro locales; Supabase Auth con las claves de `supabase.properties`
+- ✅ **Autenticación**: Login y registro con Supabase Auth; verificación real de correo (pantalla “Revisa tu correo” + reenvío)
 - 🔍 **Búsqueda y filtros**: Barrio, tipo, chip de **precio máximo**, habitaciones
-- 🗺️ **Vista de mapa**: Mock estático de Medellín
+- 🗺️ **Mapa OSM**: Pines reales por barrio (El Poblado, Laureles, Envigado, Belén, Aranjuez, etc.); toca un pin para ver el detalle
+- 📷 **Fotos reales**: Pool JPG de RentaGo en `assets/inmuebles/` (hash estable por id). Al publicar se eligen fotos de galería/cámara y se suben a Storage
 - ❤️ **Favoritos**: IDs persistidos en **DataStore** + contador en la barra
 - 💬 **Chat**: Conversación mock con arrendadores
-- 📝 **Publicar inmueble**: Formulario que **persiste** vía `RepositorioPropiedades` (local + remoto)
+- 📝 **Publicar inmueble**: Fotos, pin en el mapa y persistencia vía `RepositorioPropiedades`
 - 🏠 **Mis publicaciones**: Lista de lo publicado en la sesión
 - ⚙️ **Configuración / Acerca de / Créditos**
-- 📴 **Offline por defecto**: Sin red o sin claves usa `SampleData` (**~30 propiedades**). Con Supabase, intenta remoto y cae a local si falla la red.
+- 📴 **Offline**: Sin red o sin claves usa `SampleData` (**~30 propiedades**, fotos empaquetadas + coordenadas por barrio)
 
 ## 🏗️ Arquitectura
 
@@ -27,9 +28,12 @@ app/
 │   ├── repositorio/           # RepositorioPropiedades, RepositorioUsuarios
 │   ├── remoto/                # ClienteSupabase (REST + Auth HTTP)
 │   ├── SampleData.kt          # Semillas locales (~30) + favoritos en memoria
+│   ├── ImagenesInmuebles.kt   # Hash-por-id (mismo criterio que RentaGo)
+│   ├── CoordenadasBarrios.kt  # Pines por barrio del Valle de Aburrá
 │   └── UserPreferences.kt     # DataStore (sesión, tema, IDs favoritos)
 ├── ui/
 │   ├── theme/                 # Material 3 (Cream + Green)
+│   ├── components/            # Coil + mapa osmdroid
 │   ├── screens/               # Pantallas Compose
 │   └── navigation/            # NavHost y rutas
 └── MainActivity.kt
@@ -45,13 +49,14 @@ app/
 | **Remoto** | `ClienteSupabase` (OkHttp) |
 | **Local** | `SampleData` + publicaciones de la sesión |
 
-Las claves se leen de `supabase.properties` (y opcional override en `local.properties`) → `BuildConfig`.
+Las claves `SUPABASE_URL` y `SUPABASE_ANON_KEY` se leen de `supabase.properties` (y opcionalmente `local.properties`) y se inyectan en `BuildConfig`. Si están vacías, **no** se llama a la red.
 
 ### Navegación
 
-- **Auth**: Onboarding → Login / Register  
+- **Auth**: Onboarding → Login / Register → Revisa tu correo (si Confirm email está ON)  
 - **Principal**: Buscar, Favoritos, Chat, Perfil  
-- **Menú Perfil**: Publicar, **Mis publicaciones**, Configuración, Créditos  
+- **Detalle**: Buscar/Favoritos/Mapa → Detalle (galería + mapa) → Chat  
+- **Menú Perfil**: Publicar inmueble (fotos + pin), Mis publicaciones, Configuración, Acerca de, Créditos
 
 ## 🚀 Cómo ejecutar
 
@@ -83,8 +88,9 @@ Detalle: [`docs/supabase/CONFIGURAR.md`](docs/supabase/CONFIGURAR.md).
 
 ## 🗂️ Datos de ejemplo
 
-**~30 propiedades** (semilla base + aportes de Steve y Mariana): El Poblado, Laureles, Aranjuez, Manrique, Robledo, Bello, Itagüí, etc.  
-SQL: [`docs/supabase/esquema.sql`](docs/supabase/esquema.sql), [`semillas_steve.sql`](docs/supabase/semillas_steve.sql), [`semillas_mariana.sql`](docs/supabase/semillas_mariana.sql).
+**~30 propiedades** (semilla base + Steve y Mariana): El Poblado, Laureles, Aranjuez, Manrique, Robledo, Bello, Itagüí, etc. Cada una tiene foto del pool RentaGo y un pin distinto.  
+SQL: [`docs/supabase/esquema.sql`](docs/supabase/esquema.sql), [`semillas_steve.sql`](docs/supabase/semillas_steve.sql), [`semillas_mariana.sql`](docs/supabase/semillas_mariana.sql).  
+Migración de coordenadas/fotos/Storage: [`docs/supabase/migracion_fotos_mapa.sql`](docs/supabase/migracion_fotos_mapa.sql).
 
 ## 🔐 Privacidad
 
@@ -104,10 +110,10 @@ SQL: [`docs/supabase/esquema.sql`](docs/supabase/esquema.sql), [`semillas_steve.
 
 ## 📦 Publicación en Google Play
 
-- **Cuenta:** `juanpa.martinezro@gmail.com`  
-- **Estado:** AAB **1.0.2** (versionCode 3) listo para **prueba interna**; enlace de ficha pendiente de pegar tras liberar en Console.  
-- **Enlace:** _[completar URL de Play / Internal testing]_  
-- Package: `com.rentaya.rentola` · Nombre: **RentaYa**
+- **Cuenta Play Console**: `juanpa.martinezro@gmail.com`  
+- **Prueba interna**: https://play.google.com/apps/internaltest/4701566508678775463  
+- Package: `com.rentaya.rentola` · Nombre visible: **RentaYa**  
+- Versión demo comercial: **1.1.0** (`versionCode` 6)
 
 ## 📱 Prueba en dispositivo físico
 
