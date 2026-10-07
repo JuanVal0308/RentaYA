@@ -4,7 +4,7 @@
 
 > **Proyecto Académico** - Entrega 3: Aplicación Móvil Nativa  
 > Universidad Pontificia Bolivariana (UPB) - Curso de Aplicaciones Móviles  
-> Versión: **1.0.2** · `applicationId`: `com.rentaya.app`
+> Versión: **1.0.2** · `applicationId`: `com.rentaya.rentola`
 
 ## 📱 Características
 
@@ -107,7 +107,7 @@ SQL: [`docs/supabase/esquema.sql`](docs/supabase/esquema.sql), [`semillas_steve.
 - **Cuenta:** `juanpa.martinezro@gmail.com`  
 - **Estado:** AAB **1.0.2** (versionCode 3) listo para **prueba interna**; enlace de ficha pendiente de pegar tras liberar en Console.  
 - **Enlace:** _[completar URL de Play / Internal testing]_  
-- Package: `com.rentaya.app` · Nombre: **RentaYa**
+- Package: `com.rentaya.rentola` · Nombre: **RentaYa**
 
 ## 📱 Prueba en dispositivo físico
 

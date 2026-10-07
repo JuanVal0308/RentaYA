@@ -11,10 +11,10 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.rentaya.app"
+        applicationId = "com.rentaya.rentola"
         minSdk = 24
         targetSdk = 35
-        versionCode = 3
+        versionCode = 4
         versionName = "1.0.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

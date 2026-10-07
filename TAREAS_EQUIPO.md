@@ -72,4 +72,4 @@ Ya cumples ≥10 commits y las tareas core. Opcional:
 
 - No subir `local.properties`, keystores ni `service_role`.
 - No borrar trabajo ajeno ni `Co-authored-by` de agentes.
-- Package `com.rentaya.app` y nombre **RentaYa**.
+- Package `com.rentaya.rentola` y nombre **RentaYa**.

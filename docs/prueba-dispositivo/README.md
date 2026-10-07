@@ -21,7 +21,7 @@ Checklist para evidenciar la instalación real (requisito Entrega 3).
 | Versión de Android | _ej. 14_ |
 | Fecha (America/Bogota) | _ej. 7 oct 2026_ |
 | Cómo se instaló | APK debug / Internal Testing / otro |
-| Versión de la app | 1.0.2 (versionCode 3) |
+| Versión de la app | 1.0.2 (versionCode 4) |
 | Resultado | OK / con observaciones: ___ |
 
 ## Archivos a dejar aquí

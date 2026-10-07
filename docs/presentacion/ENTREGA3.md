@@ -1,7 +1,7 @@
 # Presentación Entrega 3 — RentaYa
 
 **Curso:** Aplicaciones Móviles · UPB · 2026  
-**App:** RentaYa (`com.rentaya.app`) · Versión **1.0.2**  
+**App:** RentaYa (`com.rentaya.rentola`) · Versión **1.0.2**  
 **Repo:** https://github.com/JuanVal0308/RentaYA  
 
 ## 1. Arquitectura
@@ -37,7 +37,7 @@ Onboarding · Login · Registro · Búsqueda · Resultados · Detalle · Favorit
 
 ## 5. Publicación Play
 
-- Package: `com.rentaya.app` · Nombre: **RentaYa**
+- Package: `com.rentaya.rentola` · Nombre: **RentaYa**
 - Cuenta: `juanpa.martinezro@gmail.com`
 - AAB: `RentaYa-1.0.2.aab` (pista **prueba interna**)
 - Enlace de ficha / testing: _[completar tras liberar en Play Console]_
