@@ -457,7 +457,7 @@ object SampleData {
             bedrooms = 2,
             bathrooms = 2,
             area = 64,
-            amenities = listOf("Parqueadero"),
+            amenities = listOf("Parqueadero", "Mascotas"),
             landlord = Landlord("Andrea Salazar", 4.6f, "325 606 7070")
         ),
         Property(

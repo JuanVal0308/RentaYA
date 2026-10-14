@@ -34,6 +34,7 @@ fun SearchScreen(
     var selectedType by remember { mutableStateOf<PropertyType?>(null) }
     var showFilters by remember { mutableStateOf(false) }
     var precioMaximo by remember { mutableStateOf(5_000_000) }
+    var soloMascotas by remember { mutableStateOf(false) }
     var propiedades by remember { mutableStateOf(RepositorioPropiedades.listarLocal()) }
     val currency = remember {
         NumberFormat.getCurrencyInstance(Locale("es", "CO")).apply {
@@ -48,14 +49,23 @@ fun SearchScreen(
         cargandoLista = false
     }
 
-    val filteredProperties = remember(searchQuery, selectedType, precioMaximo, propiedades) {
+    val filteredProperties = remember(
+        searchQuery,
+        selectedType,
+        precioMaximo,
+        soloMascotas,
+        propiedades
+    ) {
         propiedades.filter { property ->
             val matchesSearch = searchQuery.isBlank() ||
                 property.neighborhood.contains(searchQuery, ignoreCase = true) ||
                 property.title.contains(searchQuery, ignoreCase = true)
             val matchesType = selectedType == null || property.type == selectedType
             val matchesPrice = property.price <= precioMaximo
-            matchesSearch && matchesType && matchesPrice
+            val matchesPets = !soloMascotas || property.amenities.any {
+                it.equals("Mascotas", ignoreCase = true)
+            }
+            matchesSearch && matchesType && matchesPrice && matchesPets
         }
     }
 
@@ -235,11 +245,12 @@ fun SearchScreen(
     if (showFilters) {
         FiltersBottomSheet(
             precioMaximoInicial = precioMaximo,
+            soloMascotasInicial = soloMascotas,
             onDismiss = { showFilters = false },
-            onApply = { nuevoMaximo ->
+            onApply = { nuevoMaximo, nuevoSoloMascotas ->
                 precioMaximo = nuevoMaximo
+                soloMascotas = nuevoSoloMascotas
                 showFilters = false
-                onFilterResults()
             }
         )
     }
@@ -321,8 +332,9 @@ fun PropertyCard(
 @Composable
 fun FiltersBottomSheet(
     precioMaximoInicial: Int = 5_000_000,
+    soloMascotasInicial: Boolean = false,
     onDismiss: () -> Unit,
-    onApply: (Int) -> Unit
+    onApply: (Int, Boolean) -> Unit
 ) {
     var priceRange by remember {
         mutableStateOf(0f..precioMaximoInicial.toFloat().coerceIn(0f, 5_000_000f))
@@ -330,6 +342,7 @@ fun FiltersBottomSheet(
     var selectedBedrooms by remember { mutableStateOf<Int?>(null) }
     var hasParking by remember { mutableStateOf(false) }
     var isFurnished by remember { mutableStateOf(false) }
+    var soloMascotas by remember { mutableStateOf(soloMascotasInicial) }
     val precioMaximoActual = priceRange.endInclusive.toInt()
     
     ModalBottomSheet(
@@ -347,7 +360,8 @@ fun FiltersBottomSheet(
             ) {
                 TextButton(onClick = {
                     priceRange = 0f..5_000_000f
-                    onApply(5_000_000)
+                    soloMascotas = false
+                    onApply(5_000_000, false)
                 }) {
                     Text("Limpiar")
                 }
@@ -428,10 +442,25 @@ fun FiltersBottomSheet(
                 Text("Amoblado")
             }
 
+            Spacer(modifier = Modifier.height(8.dp))
+
+            FilterChip(
+                selected = soloMascotas,
+                onClick = { soloMascotas = !soloMascotas },
+                label = { Text("Mascotas") },
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Pets,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            )
+
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                onClick = { onApply(precioMaximoActual) },
+                onClick = { onApply(precioMaximoActual, soloMascotas) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)
