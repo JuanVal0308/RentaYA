@@ -47,8 +47,10 @@ Onboarding · Login · Registro · Búsqueda · Resultados · Detalle · Favorit
 | Integrante | Rol |
 |------------|-----|
 | Juan Pablo Martinez Romero | Infraestructura, Supabase, Play, docs |
-| Steve (Zteve0) | Propiedades, About, diálogo clave; completar commits restantes |
+| Steve Ellis (Zteve0) | Propiedades, filtros, About y recuperación de contraseña |
 | Mariana Osorio | Publicar, Mis publicaciones, favoritos DataStore, semillas |
+
+**Aporte de Steve Ellis:** amplió el catálogo de inmuebles, implementó el filtro de propiedades que aceptan mascotas, completó la pantalla Acerca de y agregó la orientación de recuperación de contraseña para el modo offline.
 
 ## 7. Demo sugerida (2–3 min)
 
