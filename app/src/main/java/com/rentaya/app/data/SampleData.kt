@@ -446,6 +446,32 @@ object SampleData {
             area = 125,
             amenities = listOf("Parqueadero", "Amoblado"),
             landlord = Landlord("Paula Castaño", 4.7f, "325 505 6060")
+        ),
+        Property(
+            id = "steve-26",
+            title = "Apto cerca al metro en La Floresta",
+            description = "Apartamento tranquilo a pocas cuadras de la estación Floresta, con balcón y comercios cercanos.",
+            type = PropertyType.APARTAMENTO,
+            price = 1480000,
+            neighborhood = "La Floresta",
+            bedrooms = 2,
+            bathrooms = 2,
+            area = 64,
+            amenities = listOf("Parqueadero", "Mascotas"),
+            landlord = Landlord("Andrea Salazar", 4.6f, "325 606 7070")
+        ),
+        Property(
+            id = "steve-27",
+            title = "Casa campestre en Envigado Sur",
+            description = "Casa iluminada con patio y estudio, ubicada en un sector residencial con acceso a transporte público.",
+            type = PropertyType.CASA,
+            price = 2380000,
+            neighborhood = "Envigado Sur",
+            bedrooms = 3,
+            bathrooms = 2,
+            area = 132,
+            amenities = listOf("Parqueadero", "Amoblado"),
+            landlord = Landlord("Felipe Arango", 4.8f, "325 707 8080")
         )
     ).map { propiedad ->
         val (lat, lng) = CoordenadasBarrios.de(propiedad.neighborhood, propiedad.id)

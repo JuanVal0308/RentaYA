@@ -105,7 +105,7 @@ Migración de coordenadas/fotos/Storage: [`docs/supabase/migracion_fotos_mapa.sq
 | Integrante | Rol | Notas |
 |------------|-----|-------|
 | **Juan Pablo Martinez Romero** | Desarrollador principal | Infra, Supabase, Play, docs |
-| **Steve** (Zteve0) | Desarrollador | Completo en funcionalidad base; ver commits restantes en `TAREAS_EQUIPO.md` |
+| **Steve Ellis** (Zteve0) | Desarrollador | Propiedades, recuperación de contraseña y pantalla Acerca de |
 | **Mariana Osorio** | Ingeniera | Publicar, Mis publicaciones, favoritos DataStore — **completo** |
 
 ## 📦 Publicación en Google Play
