@@ -81,7 +81,7 @@ fun CreditsScreen(
             )
 
             TeamMemberCard(
-                name = "Steve",
+                name = "Steve Ellis",
                 role = "Desarrollador"
             )
 
