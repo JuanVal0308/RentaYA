@@ -16,6 +16,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.rentaya.app.data.SampleData
 import com.rentaya.app.data.model.Message
+import com.rentaya.app.ui.components.RentaYaTopBar
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -30,8 +31,8 @@ fun MessagesScreen(
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        TopAppBar(
-            title = { Text("Mensajes") }
+        RentaYaTopBar(
+            title = "Mensajes"
         )
 
         if (messages.isEmpty()) {

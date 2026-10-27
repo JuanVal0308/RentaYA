@@ -21,6 +21,7 @@ import com.rentaya.app.data.model.Property
 import com.rentaya.app.data.model.PropertyType
 import com.rentaya.app.ui.components.ImagenPrincipalPropiedad
 import com.rentaya.app.ui.components.MapaOsm
+import com.rentaya.app.ui.components.RentaYaTopBar
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -43,6 +44,7 @@ fun SearchScreen(
     }
     var propiedadEnMapa by remember { mutableStateOf<Property?>(null) }
     var cargandoLista by remember { mutableStateOf(true) }
+    var mapaExpandido by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         propiedades = RepositorioPropiedades.listar()
@@ -70,17 +72,17 @@ fun SearchScreen(
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
+        modifier = Modifier.fillMaxSize()
     ) {
-        Text(
-            text = "RentaYa",
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.primary
+        RentaYaTopBar(
+            title = "RentaYa"
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -143,73 +145,135 @@ fun SearchScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Vista de mapa y lista con interacción mejorada
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(240.dp)
-                .clip(RoundedCornerShape(16.dp))
+                .weight(1f)
         ) {
-            MapaOsm(
-                modifier = Modifier.fillMaxSize(),
-                propiedades = filteredProperties,
-                zoom = 11.8,
-                onMarcador = { propiedadEnMapa = it }
-            )
-            Surface(
-                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
-                shape = RoundedCornerShape(20.dp),
+            // Mapa de fondo (se expande cuando mapaExpandido = true)
+            Box(
                 modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .padding(8.dp)
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
             ) {
-                Text(
-                    "${filteredProperties.size} inmuebles en Medellín",
-                    style = MaterialTheme.typography.labelMedium,
-                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+                MapaOsm(
+                    modifier = Modifier.fillMaxSize(),
+                    propiedades = filteredProperties,
+                    zoom = if (mapaExpandido) 11.8 else 11.6,
+                    onMarcador = { propiedadEnMapa = it }
                 )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "Propiedades destacadas",
-            style = MaterialTheme.typography.titleMedium
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            if (cargandoLista) {
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-            }
-            if (filteredProperties.isEmpty() && !cargandoLista) {
-                Text(
-                    "No hay propiedades que coincidan con tu búsqueda.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            filteredProperties.take(5).forEach { property ->
-                PropertyCard(
-                    property = property,
-                    onClick = { onPropertyClick(property.id) }
-                )
-            }
-            
-            if (filteredProperties.size > 5) {
-                Button(
-                    onClick = onFilterResults,
-                    modifier = Modifier.fillMaxWidth()
+                
+                // Contador de inmuebles
+                Surface(
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+                    shape = RoundedCornerShape(20.dp),
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(12.dp)
                 ) {
-                    Text("Ver ${filteredProperties.size - 5} más")
+                    Text(
+                        "${filteredProperties.size} inmuebles en Medellín",
+                        style = MaterialTheme.typography.labelMedium,
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+                    )
+                }
+
+                // Botón para expandir/colapsar mapa
+                FloatingActionButton(
+                    onClick = { mapaExpandido = !mapaExpandido },
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(12.dp),
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                ) {
+                    Icon(
+                        if (mapaExpandido) Icons.Default.List else Icons.Default.Map,
+                        if (mapaExpandido) "Ver lista" else "Expandir mapa"
+                    )
                 }
             }
+
+            // Panel de lista que se desliza sobre el mapa
+            if (!mapaExpandido) {
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.6f)
+                        .align(Alignment.BottomCenter),
+                    shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+                    tonalElevation = 8.dp,
+                    shadowElevation = 8.dp
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp)
+                    ) {
+                        // Indicador de arrastre
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 12.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .width(40.dp)
+                                    .height(4.dp)
+                                    .clip(RoundedCornerShape(2.dp))
+                                    .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f))
+                            )
+                        }
+
+                        Text(
+                            text = "Propiedades destacadas",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+
+                        // Lista de propiedades
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .verticalScroll(rememberScrollState()),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            if (cargandoLista) {
+                                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                            }
+                            if (filteredProperties.isEmpty() && !cargandoLista) {
+                                Text(
+                                    "No hay propiedades que coincidan con tu búsqueda.",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(vertical = 24.dp)
+                                )
+                            }
+                            filteredProperties.take(5).forEach { property ->
+                                PropertyCard(
+                                    property = property,
+                                    onClick = { onPropertyClick(property.id) }
+                                )
+                            }
+
+                            if (filteredProperties.size > 5) {
+                                Button(
+                                    onClick = onFilterResults,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(bottom = 16.dp)
+                                ) {
+                                    Text("Ver ${filteredProperties.size - 5} más")
+                                }
+                            }
+                            
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
+                    }
+                }
+            }
+        }
         }
     }
 

@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import com.rentaya.app.data.model.Property
 import com.rentaya.app.data.repositorio.RepositorioPropiedades
 import com.rentaya.app.ui.components.MapaOsm
+import com.rentaya.app.ui.components.RentaYaTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,13 +28,10 @@ fun ResultsScreen(
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        TopAppBar(
-            title = { Text("Resultados (${propiedades.size})") },
-            navigationIcon = {
-                IconButton(onClick = onBack) {
-                    Icon(Icons.Default.ArrowBack, "Volver")
-                }
-            },
+        RentaYaTopBar(
+            title = "Resultados (${propiedades.size})",
+            showBackButton = true,
+            onBackClick = onBack,
             actions = {
                 IconButton(onClick = { showMapView = !showMapView }) {
                     Icon(

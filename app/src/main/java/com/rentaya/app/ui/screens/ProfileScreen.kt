@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.rentaya.app.BuildConfig
 import com.rentaya.app.data.UserPreferences
 import com.rentaya.app.data.remoto.ClienteSupabase
+import com.rentaya.app.ui.components.RentaYaTopBar
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -42,16 +43,18 @@ fun ProfileScreen(
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
+        modifier = Modifier.fillMaxSize()
     ) {
-        Text(
-            text = "Perfil",
-            style = MaterialTheme.typography.titleLarge
+        RentaYaTopBar(
+            title = "Perfil"
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+        Spacer(modifier = Modifier.height(8.dp))
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -133,6 +136,7 @@ fun ProfileScreen(
                     modifier = Modifier.clickable(onClick = onCredits)
                 )
             }
+        }
         }
     }
 
