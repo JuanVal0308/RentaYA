@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.rentaya.app.data.SampleData
 import com.rentaya.app.data.repositorio.RepositorioPropiedades
+import com.rentaya.app.ui.components.RentaYaTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,15 +25,11 @@ fun FavoritesScreen(
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        TopAppBar(
-            title = {
-                Text(
-                    if (favoriteProperties.isEmpty()) {
-                        "Favoritos"
-                    } else {
-                        "${favoriteProperties.size} favoritos"
-                    }
-                )
+        RentaYaTopBar(
+            title = if (favoriteProperties.isEmpty()) {
+                "Favoritos"
+            } else {
+                "${favoriteProperties.size} favoritos"
             }
         )
 

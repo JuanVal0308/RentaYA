@@ -16,6 +16,7 @@ import com.rentaya.app.data.SampleData
 import com.rentaya.app.data.repositorio.RepositorioPropiedades
 import com.rentaya.app.data.model.ChatMessage
 import com.rentaya.app.data.model.Message
+import com.rentaya.app.ui.components.RentaYaTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,25 +39,10 @@ fun ChatScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Column {
-                        Text(
-                            text = property?.landlord?.name ?: "Chat",
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                        Text(
-                            text = property?.title ?: "",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Volver")
-                    }
-                }
+            RentaYaTopBar(
+                title = property?.landlord?.name ?: "Chat",
+                showBackButton = true,
+                onBackClick = onBack
             )
         },
         bottomBar = {

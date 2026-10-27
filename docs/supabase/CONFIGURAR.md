@@ -39,7 +39,10 @@ Estos no se pueden hacer solo desde el APK. Entrá con `juanpa.martinezromero@gm
    - **Redirect URLs**:
      - `https://juanval0308.github.io/RentaYA/**`
      - `rentaya://auth-callback`
-3. El correo de verificación puede apuntar a GitHub Pages o al deep link `rentaya://auth-callback`. En el celular, tras confirmar, el usuario vuelve a la app y pulsa **Ya confirmé, iniciar sesión**.
+3. El correo de verificación redirige a **`https://juanval0308.github.io/RentaYA/verificado.html`** (página de confirmación exitosa) que a su vez intenta abrir la app mediante el deep link `rentaya://auth-callback`. Si la página no existe aún en GitHub Pages, desplegarla con el contenido de `docs/verificado.html`.
+4. En el celular, tras confirmar en el email, el usuario ve "¡Verificado!" y puede volver a la app para iniciar sesión.
+
+**Importante**: La página `docs/verificado.html` debe estar publicada en GitHub Pages para evitar error 404. El deep link `rentaya://auth-callback` ya está configurado en el AndroidManifest de la app.
 
 No hay atajo de verificación en *release*. En debug, solo si `local.properties` tiene `DEBUG_OMITIR_VERIFICACION_CORREO=true` (no usar en pitches).
 

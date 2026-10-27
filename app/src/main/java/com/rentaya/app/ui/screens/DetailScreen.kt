@@ -20,6 +20,7 @@ import com.rentaya.app.data.SampleData
 import com.rentaya.app.data.repositorio.RepositorioPropiedades
 import com.rentaya.app.ui.components.ImagenPropiedad
 import com.rentaya.app.ui.components.MapaOsm
+import com.rentaya.app.ui.components.RentaYaTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,6 +45,13 @@ fun DetailScreen(
     }
 
     Scaffold(
+        topBar = {
+            RentaYaTopBar(
+                title = property.title.take(25) + if (property.title.length > 25) "..." else "",
+                showBackButton = true,
+                onBackClick = onBack
+            )
+        },
         bottomBar = {
             Surface(
                 tonalElevation = 3.dp,
@@ -122,18 +130,7 @@ fun DetailScreen(
                     }
                 }
 
-                IconButton(
-                    onClick = onBack,
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .background(
-                            MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
-                            shape = RoundedCornerShape(50)
-                        )
-                ) {
-                    Icon(Icons.Default.ArrowBack, "Volver")
-                }
-
+                // Botón de favorito flotante
                 IconButton(
                     onClick = {
                         SampleData.toggleFavorite(propertyId)

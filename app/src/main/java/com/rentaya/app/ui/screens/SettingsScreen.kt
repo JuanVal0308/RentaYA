@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.rentaya.app.data.UserPreferences
 import com.rentaya.app.data.remoto.ClienteSupabase
+import com.rentaya.app.ui.components.RentaYaTopBar
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -33,13 +34,10 @@ fun SettingsScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Configuración") },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Volver")
-                    }
-                }
+            RentaYaTopBar(
+                title = "Configuración",
+                showBackButton = true,
+                onBackClick = onBack
             )
         }
     ) { paddingValues ->

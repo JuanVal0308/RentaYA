@@ -33,6 +33,7 @@ import com.rentaya.app.data.model.PropertyType
 import com.rentaya.app.data.remoto.ClienteSupabase
 import com.rentaya.app.data.repositorio.RepositorioPropiedades
 import com.rentaya.app.ui.components.MapaOsm
+import com.rentaya.app.ui.components.RentaYaTopBar
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.io.File
@@ -111,13 +112,10 @@ fun PublishPropertyScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Publicar Inmueble") },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Volver")
-                    }
-                }
+            RentaYaTopBar(
+                title = "Publicar Inmueble",
+                showBackButton = true,
+                onBackClick = onBack
             )
         }
     ) { paddingValues ->
